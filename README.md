@@ -51,3 +51,4 @@ npm start
 After starting CYGA, navigate to `http://localhost:3000` (or your configured host and port) to access the dashboard.
 
 For detailed usage instructions, please refer to our [User Guide](docs/USER_GUIDE.md).
+

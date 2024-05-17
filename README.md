@@ -25,7 +25,7 @@ To get started with CYGA, please follow these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/CYGA.git
+git clone https://github.com/DroitXenon/CYGA.git
 ```
 
 2. Navigate to the CYGA directory:

@@ -28,7 +28,7 @@ const AttacksTable = () => {
   useEffect(() => {
     axios.get('http://localhost:5001/api/attacks')
       .then(response => {
-        console.log('Data fetched:', response.data); // Log the fetched data
+        console.log('Data fetched:', response.data);
         setData(response.data);
       })
       .catch(error => {

@@ -2,6 +2,8 @@
 
 Welcome to the official repository for CYGA, the cutting-edge Cyber Geolocation Analysis tool designed to empower cybersecurity teams with real-time data and insights. CYGA is your go-to solution for tracking, analyzing, and responding to cyber threats with precision and efficiency.
 
+<img src="assets/logo.png" alt="CYGA Logo" width="300"/>
+
 ## Features
 
 CYGA comes packed with an array of powerful features:
@@ -23,7 +25,7 @@ To get started with CYGA, please follow these steps:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/CYGA.git
+git clone https://github.com/DroitXenon/CYGA.git
 ```
 
 2. Navigate to the CYGA directory:

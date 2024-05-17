@@ -2,7 +2,7 @@
 
 Welcome to the official repository for CYGA, the cutting-edge Cyber Geolocation Analysis tool designed to empower cybersecurity teams with real-time data and insights. CYGA is your go-to solution for tracking, analyzing, and responding to cyber threats with precision and efficiency.
 
-<img src="assets/logo.png" alt="CYGA Logo" width="300"/>
+<img src="shared/constants/logo.png" alt="CYGA Logo" width="300"/>
 
 ## Features
 

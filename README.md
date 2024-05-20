@@ -30,7 +30,7 @@ Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designe
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/DroitXenon/.git
+    git clone https://github.com/DroitXenon/CYGA.git
     cd CYGA/server
     ```
 

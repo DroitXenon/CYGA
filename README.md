@@ -88,6 +88,12 @@ Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designe
     npm install
     ```
 
+2. **Install the Material-UI:**
+
+    ```bash
+    npm install @mui/material @mui/styled-engine @emotion/react @emotion/styled
+    ```
+
 3. **Start the React application:**
 
     ```bash

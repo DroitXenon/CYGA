@@ -3,7 +3,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql');
 const fs = require('fs');
+const path = require('path'); 
 const csv = require('csv-parser');
+
 const app = express();
 const port = 5001;
 
@@ -12,8 +14,8 @@ app.use(bodyParser.json());
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
-  password: '',
+  user: 'root', //replace with your own user
+  password: '', //replace with your own password
   database: 'web_traffic'
 });
 
@@ -47,7 +49,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
         if (err) throw err;
         console.log('Table created or already exists...');
 
-        const filePath = '/Users/droitxenon/Developer/project/cyberex/shared/constants/cybersecurity_attacks.csv';
+        const filePath = path.join(__dirname, '../shared/constants/cybersecurity_attacks.csv'); // Use relative path
         const csvData = [];
 
         fs.createReadStream(filePath)
@@ -62,11 +64,11 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
             if (timestamp && source_ip && attack_type && target && severity !== null) {
               csvData.push([timestamp, source_ip, attack_type, target, severity]);
             } else {
-              console.log('Invalid row:', row); 
+              console.log('Invalid row:', row); // Log invalid rows for debugging
             }
           })
           .on('end', () => {
-            console.log('CSV data:', csvData);
+            console.log('CSV data:', csvData); // Log the CSV data
             if (csvData.length > 0) {
               const insertQuery = `
                 INSERT INTO cybersecurity_attacks (timestamp, source_ip, attack_type, target, severity)
@@ -97,5 +99,5 @@ app.get('/api/attacks', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server port ${port}`);
 });

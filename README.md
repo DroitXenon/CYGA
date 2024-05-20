@@ -4,6 +4,11 @@ Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designe
 
 <img src="shared/constants/logo.png" alt="CYGA Logo" width="300"/>
 
+## Team Member
+* [Yiran Dong](https://github.com/Rileyyiran)
+* [Liang He](https://github.com/zaizaijiayou)
+* [Yuqing Zhang](https://github.com/Yuqing-Zhang-branch)
+* [Justin Wang](https://github.com/DroitXenon)  
 
 ## Features
 

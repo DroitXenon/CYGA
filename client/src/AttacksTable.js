@@ -53,7 +53,7 @@ const AttacksTable = () => {
     const selectedData = data.filter(item => selectedRows.has(item.id));
     console.log('Selected rows data:', selectedData);
 
-    const openai = new OpenAI({ apiKey: '', dangerouslyAllowBrowser: true });;
+    const openai = new OpenAI({ apiKey: 'Replace with your own API key', dangerouslyAllowBrowser: true });;
 
     try {
       const response = await openai.chat.completions.create({

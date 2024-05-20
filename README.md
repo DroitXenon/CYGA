@@ -1,12 +1,10 @@
 # CYGA - Cyber Geolocation Analysis
 
-Welcome to the official repository for CYGA, the cutting-edge Cyber Geolocation Analysis tool designed to empower cybersecurity teams with real-time data and insights. CYGA is your go-to solution for tracking, analyzing, and responding to cyber threats with precision and efficiency.
-
+Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designed to show real-time data and insights. CYGA is designed for tracking, analyzing, and responding to cyber threats with precision and efficiency. This project is a web application built with React and Material-UI on the front end, Node.js and Express on the back end, and MySQL for the database. 
 <img src="shared/constants/logo.png" alt="CYGA Logo" width="300"/>
 
-## Features
 
-CYGA comes packed with an array of powerful features:
+## Features
 
 - **Timestamping:** Every event is recorded with a precise timestamp, ensuring that you can track the sequence of events down to the millisecond.
 
@@ -18,37 +16,99 @@ CYGA comes packed with an array of powerful features:
 
 - **Data Statistics:** Comprehensive statistics offer a macro and micro view of the cyber threat landscape, aiding in strategic decision-making.
 
-## Getting Started
+## Prerequisites
+- React for Front-end Development
+- Node.js and Express.js for Back-end Development
+- MySQL for Database Management
+- OpenAI API key (Optional)
 
-To get started with CYGA, please follow these steps:
+## Installation
 
-1. Clone the repository:
+### Backend Setup
 
-```bash
-git clone https://github.com/DroitXenon/CYGA.git
-```
+1. **Clone the repository:**
 
-2. Navigate to the CYGA directory:
+    ```bash
+    git clone https://github.com/DroitXenon/.git
+    cd CYGA/server
+    ```
 
-```bash
-cd CYGA
-```
+2. **Install the dependencies:**
 
-3. Install dependencies (example using npm):
+    ```bash
+    npm install
+    ```
 
-```bash
-npm install
-```
+3. **Create the MySQL database:**
 
-4. Start the application:
+    ```sql
+    CREATE DATABASE web_traffic;
+    ```
 
-```bash
-npm start
-```
+4. **Update the MySQL connection details in `server.js`:**
+
+    ```javascript
+    const db = mysql.createConnection({
+      host: 'localhost',
+      user: 'Change to Your Own User',
+      password: 'Change to Your Own Password', 
+      database: 'web_traffic'
+    });
+    ```
+
+5. **Start the backend server:**
+
+    ```bash
+    node server.js
+    ```
+
+### Frontend Setup
+
+1. **Navigate to the frontend directory:**
+
+    ```bash
+    cd ../client
+    ```
+
+2. **Update the OpenAI API Key in `server.js`:**
+
+    ```javascript
+    const openai = new OpenAI({ apiKey: 'Replace with your own API key', dangerouslyAllowBrowser: true });;
+    ```
+
+2. **Install the dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+3. **Start the React application:**
+
+    ```bash
+    npm start
+    ```
 
 ## Usage
 
-After starting CYGA, navigate to `http://localhost:3000` (or your configured host and port) to access the dashboard.
+1. Open your browser and go to `http://localhost:3000`.
+2. View the cybersecurity attack data in the table.
+3. Click on the column headers to sort the data.
+4. Select rows using the checkboxes.
+5. Click the "Analysis" button to analyze the selected rows using the OpenAI API.
+6. View the analysis results displayed below the table.
 
-For detailed usage instructions, please refer to our [User Guide](docs/USER_GUIDE.md).
+## Technologies Used
 
+- **Frontend:**
+  - React
+  - Material-UI
+
+- **Backend:**
+  - Node.js
+  - Express
+
+- **Database:**
+  - MySQL
+
+- **API:**
+  - OpenAI API

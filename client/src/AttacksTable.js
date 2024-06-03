@@ -53,7 +53,7 @@ const AttacksTable = () => {
     const selectedData = data.filter(item => selectedRows.has(item.id));
     console.log('Selected rows data:', selectedData);
 
-    const openai = new OpenAI({ apiKey: 'Replace with your own API key', dangerouslyAllowBrowser: true });;
+    const openai = new OpenAI({ apiKey: 'Replace with your own API key', dangerouslyAllowBrowser: true });
 
     try {
       const response = await openai.chat.completions.create({
@@ -118,51 +118,71 @@ const AttacksTable = () => {
                   ID
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'timestamp' ? sortConfig.direction : false}>
+              <TableCell sortDirection={sortConfig.key === 'Timestamp' ? sortConfig.direction : false}>
                 <TableSortLabel
-                  active={sortConfig.key === 'timestamp'}
-                  direction={sortConfig.key === 'timestamp' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('timestamp')}
+                  active={sortConfig.key === 'Timestamp'}
+                  direction={sortConfig.key === 'Timestamp' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('Timestamp')}
                 >
                   Timestamp
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'source_ip' ? sortConfig.direction : false}>
+              <TableCell sortDirection={sortConfig.key === 'SourceIP' ? sortConfig.direction : false}>
                 <TableSortLabel
-                  active={sortConfig.key === 'source_ip'}
-                  direction={sortConfig.key === 'source_ip' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('source_ip')}
+                  active={sortConfig.key === 'SourceIP'}
+                  direction={sortConfig.key === 'SourceIP' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('SourceIP')}
                 >
                   Source IP
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'attack_type' ? sortConfig.direction : false}>
+              <TableCell sortDirection={sortConfig.key === 'DestinationIP' ? sortConfig.direction : false}>
                 <TableSortLabel
-                  active={sortConfig.key === 'attack_type'}
-                  direction={sortConfig.key === 'attack_type' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('attack_type')}
+                  active={sortConfig.key === 'DestinationIP'}
+                  direction={sortConfig.key === 'DestinationIP' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('DestinationIP')}
+                >
+                  Destination IP
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={sortConfig.key === 'AttackType' ? sortConfig.direction : false}>
+                <TableSortLabel
+                  active={sortConfig.key === 'AttackType'}
+                  direction={sortConfig.key === 'AttackType' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('AttackType')}
                 >
                   Attack Type
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'target' ? sortConfig.direction : false}>
+              <TableCell sortDirection={sortConfig.key === 'SeverityLevel' ? sortConfig.direction : false}>
                 <TableSortLabel
-                  active={sortConfig.key === 'target'}
-                  direction={sortConfig.key === 'target' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('target')}
-                >
-                  Target
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'severity' ? sortConfig.direction : false}>
-                <TableSortLabel
-                  active={sortConfig.key === 'severity'}
-                  direction={sortConfig.key === 'severity' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('severity')}
+                  active={sortConfig.key === 'SeverityLevel'}
+                  direction={sortConfig.key === 'SeverityLevel' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('SeverityLevel')}
                 >
                   Severity
                 </TableSortLabel>
               </TableCell>
+              <TableCell sortDirection={sortConfig.key === 'Protocol' ? sortConfig.direction : false}>
+                <TableSortLabel
+                  active={sortConfig.key === 'Protocol'}
+                  direction={sortConfig.key === 'Protocol' ? sortConfig.direction : 'asc'}
+                  onClick={() => handleSort('Protocol')}
+                >
+                  Protocol
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Action Taken</TableCell>
+              <TableCell>Anomaly Scores</TableCell>
+              <TableCell>Packet Length</TableCell>
+              <TableCell>Packet Type</TableCell>
+              <TableCell>Traffic Type</TableCell>
+              <TableCell>Segment</TableCell>
+              <TableCell>User Info</TableCell>
+              <TableCell>Device Info</TableCell>
+              <TableCell>GeoLocation</TableCell>
+              <TableCell>Log Source</TableCell>
+              <TableCell>Attack Signature</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,11 +195,23 @@ const AttacksTable = () => {
                   />
                 </TableCell>
                 <TableCell>{item.id}</TableCell>
-                <TableCell>{item.timestamp}</TableCell>
-                <TableCell>{item.source_ip}</TableCell>
-                <TableCell>{item.attack_type}</TableCell>
-                <TableCell>{item.target}</TableCell>
-                <TableCell>{item.severity}</TableCell>
+                <TableCell>{item.Timestamp}</TableCell>
+                <TableCell>{item.SourceIP}</TableCell>
+                <TableCell>{item.DestinationIP}</TableCell>
+                <TableCell>{item.AttackType}</TableCell>
+                <TableCell>{item.SeverityLevel}</TableCell>
+                <TableCell>{item.Protocol}</TableCell>
+                <TableCell>{item.ActionTaken}</TableCell>
+                <TableCell>{item.AnomalyScores}</TableCell>
+                <TableCell>{item.PacketLength}</TableCell>
+                <TableCell>{item.PacketType}</TableCell>
+                <TableCell>{item.TrafficType}</TableCell>
+                <TableCell>{item.Segment}</TableCell>
+                <TableCell>{item.UserInfo}</TableCell>
+                <TableCell>{item.DeviceInfo}</TableCell>
+                <TableCell>{item.GeoLocation}</TableCell>
+                <TableCell>{item.LogSource}</TableCell>
+                <TableCell>{item.AttackSignature}</TableCell>
               </TableRow>
             ))}
           </TableBody>

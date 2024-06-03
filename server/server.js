@@ -34,95 +34,196 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   db.query('USE web_traffic', (err) => {
     if (err) throw err;
 
-    // Create a comprehensive table
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS comprehensive_data (
+    // Create attacker table
+    const createAttackerTableQuery = `
+      CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        Timestamp VARCHAR(255),
         SourceIP VARCHAR(255),
+        SourcePort INT
+      );
+    `;
+
+    // Create victim table
+    const createVictimTableQuery = `
+      CREATE TABLE IF NOT EXISTS victim (
+        id INT AUTO_INCREMENT PRIMARY KEY,
         DestinationIP VARCHAR(255),
-        SourcePort INT,
         DestinationPort INT,
+        UserInfo VARCHAR(255),
+        DeviceInfo VARCHAR(255),
+        GeoLocation VARCHAR(255)
+      );
+    `;
+
+    // Create network_traffic table
+    const createNetworkTrafficTableQuery = `
+      CREATE TABLE IF NOT EXISTS network_traffic (
+        id INT AUTO_INCREMENT PRIMARY KEY,
         Protocol VARCHAR(255),
         PacketLength INT,
         PacketType VARCHAR(255),
         TrafficType VARCHAR(255),
+        Segment VARCHAR(255)
+      );
+    `;
+
+    // Create response table
+    const createResponseTableQuery = `
+      CREATE TABLE IF NOT EXISTS response (
+        id INT AUTO_INCREMENT PRIMARY KEY,
         AnomalyScores VARCHAR(255),
-        AttackType VARCHAR(255),
-        AttackSignature VARCHAR(255),
         ActionTaken VARCHAR(255),
         SeverityLevel VARCHAR(255),
-        UserInfo VARCHAR(255),
-        DeviceInfo VARCHAR(255),
-        NetworkSegment VARCHAR(255),
-        GeoLocation VARCHAR(255),
         LogSource VARCHAR(255)
       );
     `;
 
-    db.query(createTableQuery, (err, result) => {
+    // Create attack table
+    const createAttackTableQuery = `
+      CREATE TABLE IF NOT EXISTS attack (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        AttackType VARCHAR(255),
+        Timestamp VARCHAR(255),
+        AttackSignature VARCHAR(255)
+      );
+    `;
+
+    // Execute table creation queries
+    db.query(createAttackerTableQuery, (err, result) => {
       if (err) throw err;
-      console.log('Comprehensive table created or already exists...');
+      console.log('Attacker table created or already exists...');
       
-      const importCSV = () => {
-        // Path to the CSV file
-        const filePath = path.join(__dirname, '../shared/constants/test.csv');
-        const csvData = [];
+      db.query(createVictimTableQuery, (err, result) => {
+        if (err) throw err;
+        console.log('Victim table created or already exists...');
+        
+        db.query(createNetworkTrafficTableQuery, (err, result) => {
+          if (err) throw err;
+          console.log('Network Traffic table created or already exists...');
+          
+          db.query(createResponseTableQuery, (err, result) => {
+            if (err) throw err;
+            console.log('Response table created or already exists...');
+            
+            db.query(createAttackTableQuery, (err, result) => {
+              if (err) throw err;
+              console.log('Attack table created or already exists...');
 
-        fs.createReadStream(filePath)
-          .pipe(csv())
-          .on('data', (row) => {
-            // Process each row and populate the comprehensive table
-            const comprehensiveRow = [
-              row.Timestamp,
-              row['Source IP Address'],
-              row['Destination IP Address'],
-              row['Source Port'],
-              row['Destination Port'],
-              row.Protocol,
-              row['Packet Length'],
-              row['Packet Type'],
-              row['Traffic Type'],
-              row['Anomaly Scores'],
-              row['Attack Type'],
-              row['Attack Signature'],
-              row['Action Taken'],
-              row['Severity Level'],
-              row['User Information'],
-              row['Device Information'],
-              row['Network Segment'],
-              row['Geo-location Data'],
-              row['Log Source']
-            ];
-            csvData.push(comprehensiveRow);
-          })
-          .on('end', () => {
-            console.log('CSV data:', csvData);
-            if (csvData.length > 0) {
-              const insertQuery = `
-                INSERT INTO comprehensive_data (
-                  Timestamp, SourceIP, DestinationIP, SourcePort, DestinationPort, Protocol,
-                  PacketLength, PacketType, TrafficType, AnomalyScores, AttackType, AttackSignature,
-                  ActionTaken, SeverityLevel, UserInfo, DeviceInfo, NetworkSegment, GeoLocation, LogSource
-                ) VALUES ?
-              `;
-              db.query(insertQuery, [csvData], (err, result) => {
-                if (err) throw err;
-                console.log('CSV data imported into comprehensive_data table...');
-              });
-            } else {
-              console.log('No valid data to import.');
-            }
+              const importCSV = () => {
+                // Path to the CSV file
+                const filePath = path.join(__dirname, '../shared/constants/test.csv');
+                const csvData = [];
+
+                fs.createReadStream(filePath)
+                  .pipe(csv())
+                  .on('data', (row) => {
+                    // Process each row and populate the tables
+                    const attackerRow = [
+                      row['Source IP Address'], 
+                      row['Source Port']
+                    ];
+                    const victimRow = [
+                      row['Destination IP Address'],
+                      row['Destination Port'],
+                      row['User Information'],
+                      row['Device Information'],
+                      row['Geo-location Data']
+                    ];
+                    const networkTrafficRow = [
+                      row.Protocol,
+                      row['Packet Length'],
+                      row['Packet Type'],
+                      row['Traffic Type'],
+                      row['Network Segment']
+                    ];
+                    const responseRow = [
+                      row['Anomaly Scores'],
+                      row['Action Taken'],
+                      row['Severity Level'],
+                      row['Log Source']
+                    ];
+                    const attackRow = [
+                      row['Attack Type'],
+                      row.Timestamp,
+                      row['Attack Signature']
+                    ];
+                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, attackRow });
+                  })
+                  .on('end', () => {
+                    console.log('CSV data:', csvData);
+                    if (csvData.length > 0) {
+                      const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort) VALUES ?';
+                      const attackerData = csvData.map(row => row.attackerRow);
+
+                      db.query(insertAttackerQuery, [attackerData], (err, result) => {
+                        if (err) throw err;
+                        console.log('Attacker data imported...');
+
+                        const attackerIdMapping = csvData.map((row, index) => ({
+                          ...row,
+                          attackerId: result.insertId + index
+                        }));
+
+                        const victimData = attackerIdMapping.map(row => row.victimRow);
+                        const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation) VALUES ?';
+
+                        db.query(insertVictimQuery, [victimData], (err, result) => {
+                          if (err) throw err;
+                          console.log('Victim data imported...');
+
+                          const networkTrafficData = attackerIdMapping.map(row => row.networkTrafficRow);
+                          const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment) VALUES ?';
+
+                          db.query(insertNetworkTrafficQuery, [networkTrafficData], (err, result) => {
+                            if (err) throw err;
+                            console.log('Network Traffic data imported...');
+
+                            const responseData = attackerIdMapping.map(row => row.responseRow);
+                            const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource) VALUES ?';
+
+                            db.query(insertResponseQuery, [responseData], (err, result) => {
+                              if (err) throw err;
+                              console.log('Response data imported...');
+
+                              const attackData = attackerIdMapping.map(row => row.attackRow);
+                              const insertAttackQuery = 'INSERT INTO attack (AttackType, Timestamp, AttackSignature) VALUES ?';
+
+                              db.query(insertAttackQuery, [attackData], (err, result) => {
+                                if (err) throw err;
+                                console.log('Attack data imported...');
+                              });
+                            });
+                          });
+                        });
+                      });
+                    } else {
+                      console.log('No valid data to import.');
+                    }
+                  });
+              };
+
+              importCSV();
+            });
           });
-      };
-
-      importCSV();
+        });
+      });
     });
   });
 });
 
 app.get('/api/attacks', (req, res) => {
-  const query = 'SELECT * FROM comprehensive_data';
+  const query = `
+    SELECT a.SourceIP, a.SourcePort,
+           v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
+           n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
+           r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource,
+           t.AttackType, t.Timestamp, t.AttackSignature
+    FROM attack t
+    JOIN response r ON t.id = r.id
+    JOIN network_traffic n ON t.id = n.id
+    JOIN victim v ON t.id = v.id
+    JOIN attacker a ON t.id = a.id
+  `;
   db.query(query, (err, results) => {
     if (err) throw err;
     res.json(results);

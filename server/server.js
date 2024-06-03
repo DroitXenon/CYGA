@@ -35,50 +35,55 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
 
     const createAttackerTableQuery = `
       CREATE TABLE IF NOT EXISTS attacker (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        uid INT AUTO_INCREMENT PRIMARY KEY,
         SourceIP VARCHAR(255),
         SourcePort INT
+        FOREIGN KEY(UID) REFERENCES USER(UID)
       );
     `;
 
     const createVictimTableQuery = `
       CREATE TABLE IF NOT EXISTS victim (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        uid INT AUTO_INCREMENT PRIMARY KEY,
         DestinationIP VARCHAR(255),
         DestinationPort INT,
         UserInfo VARCHAR(255),
         DeviceInfo VARCHAR(255),
         GeoLocation VARCHAR(255)
+        FOREIGN KEY(UID) REFERENCES USER(UID)
       );
     `;
 
     const createNetworkTrafficTableQuery = `
       CREATE TABLE IF NOT EXISTS network_traffic (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        nid INT AUTO_INCREMENT PRIMARY KEY,
         Protocol VARCHAR(255),
         PacketLength INT,
         PacketType VARCHAR(255),
         TrafficType VARCHAR(255),
         Segment VARCHAR(255)
+        FOREIGN KEY(UID) REFERENCES VICTIM(UID)
       );
     `;
 
     const createResponseTableQuery = `
       CREATE TABLE IF NOT EXISTS response (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        rid INT AUTO_INCREMENT PRIMARY KEY,
         AnomalyScores VARCHAR(255),
         ActionTaken VARCHAR(255),
         SeverityLevel VARCHAR(255),
         LogSource VARCHAR(255)
+        FOREIGN KEY(IID) REFERENCES INCIDENT(IID)
       );
     `;
 
-    const createAttackTableQuery = `
-      CREATE TABLE IF NOT EXISTS attack (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        AttackType VARCHAR(255),
+    const createIncidentTableQuery = `
+      CREATE TABLE IF NOT EXISTS incident (
+        iid INT AUTO_INCREMENT PRIMARY KEY,
+        IncidentType VARCHAR(255),
         Timestamp VARCHAR(255),
-        AttackSignature VARCHAR(255)
+        IncidentSignature VARCHAR(255)
+        FOREIGN KEY(UID) REFERENCES ATTACKER(UID)
       );
     `;
 
@@ -99,9 +104,9 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
             if (err) throw err;
             console.log('Response table created or already exists...');
             
-            db.query(createAttackTableQuery, (err, result) => {
+            db.query(createIncidentTableQuery, (err, result) => {
               if (err) throw err;
-              console.log('Attack table created or already exists...');
+              console.log('Incident table created or already exists...');
 
               const importCSV = () => {
                 const filePath = path.join(__dirname, '../shared/constants/test.csv');
@@ -135,12 +140,12 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
                       row['Severity Level'],
                       row['Log Source']
                     ];
-                    const attackRow = [
-                      row['Attack Type'],
+                    const incidentRow = [
+                      row['Incident Type'],
                       row.Timestamp,
-                      row['Attack Signature']
+                      row['Incident Signature']
                     ];
-                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, attackRow });
+                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, incidentRow });
                   })
                   .on('end', () => {
                     console.log('CSV data:', csvData);
@@ -152,38 +157,38 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
                         if (err) throw err;
                         console.log('Attacker data imported...');
 
-                        const attackerIdMapping = csvData.map((row, index) => ({
+                        const attackerUidMapping = csvData.map((row, index) => ({
                           ...row,
-                          attackerId: result.insertId + index
+                          attackerUid: result.insertUid + index
                         }));
 
-                        const victimData = attackerIdMapping.map(row => row.victimRow);
+                        const victimData = attackerUidMapping.map(row => row.victimRow);
                         const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation) VALUES ?';
 
                         db.query(insertVictimQuery, [victimData], (err, result) => {
                           if (err) throw err;
                           console.log('Victim data imported...');
 
-                          const networkTrafficData = attackerIdMapping.map(row => row.networkTrafficRow);
+                          const networkTrafficData = attackerUidMapping.map(row => row.networkTrafficRow);
                           const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment) VALUES ?';
 
                           db.query(insertNetworkTrafficQuery, [networkTrafficData], (err, result) => {
                             if (err) throw err;
                             console.log('Network Traffic data imported...');
 
-                            const responseData = attackerIdMapping.map(row => row.responseRow);
+                            const responseData = attackerUidMapping.map(row => row.responseRow);
                             const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource) VALUES ?';
 
                             db.query(insertResponseQuery, [responseData], (err, result) => {
                               if (err) throw err;
                               console.log('Response data imported...');
 
-                              const attackData = attackerIdMapping.map(row => row.attackRow);
-                              const insertAttackQuery = 'INSERT INTO attack (AttackType, Timestamp, AttackSignature) VALUES ?';
+                              const incidentData = incidentIidMapping.map(row => row.incidentRow);
+                              const insertIncidentQuery = 'INSERT INTO incident (IncidentType, Timestamp, IncidentSignature) VALUES ?';
 
-                              db.query(insertAttackQuery, [attackData], (err, result) => {
+                              db.query(insertIncidentQuery, [incidentData], (err, result) => {
                                 if (err) throw err;
-                                console.log('Attack data imported...');
+                                console.log('Incident data imported...');
                               });
                             });
                           });
@@ -210,12 +215,12 @@ app.get('/api/attacks', (req, res) => {
            v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
            n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
            r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource,
-           t.AttackType, t.Timestamp, t.AttackSignature
-    FROM attack t
-    JOIN response r ON t.id = r.id
-    JOIN network_traffic n ON t.id = n.id
-    JOIN victim v ON t.id = v.id
-    JOIN attacker a ON t.id = a.id
+           t.IncidentType, t.Timestamp, t.IncidentSignature
+    FROM incident t
+    JOIN response r ON t.rid = r.rid
+    JOIN network_traffic n ON t.nid = n.nid
+    JOIN victim v ON t.uid = v.uid
+    JOIN attacker a ON t.uid = a.uid
   `;
   db.query(query, (err, results) => {
     if (err) throw err;

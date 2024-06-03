@@ -15,7 +15,11 @@ import {
   CardContent,
   Typography,
   Box,
-  TextField
+  TextField,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select
 } from '@mui/material';
 import { OpenAI } from 'openai';
 
@@ -27,6 +31,12 @@ const AttacksTable = () => {
   const [error, setError] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    idFrom: '',
+    idTo: '',
+    severity: '',
+    protocol: ''
+  });
 
   useEffect(() => {
     axios.get('http://localhost:5001/api/attacks')
@@ -107,39 +117,101 @@ const AttacksTable = () => {
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
     setSearchQuery(value);
-    setFilteredData(data.filter(item => 
-      item.Timestamp.toLowerCase().includes(value) ||
-      item.SourceIP.toLowerCase().includes(value) ||
-      item.DestinationIP.toLowerCase().includes(value) ||
-      item.SourcePort.toString().includes(value) ||
-      item.DestinationPort.toString().includes(value) ||
-      item.AttackType.toLowerCase().includes(value) ||
-      item.AttackSignature.toLowerCase().includes(value) ||
-      item.ActionTaken.toLowerCase().includes(value) ||
-      item.SeverityLevel.toLowerCase().includes(value) ||
-      item.UserInfo.toLowerCase().includes(value) ||
-      item.DeviceInfo.toLowerCase().includes(value) ||
-      item.GeoLocation.toLowerCase().includes(value) ||
-      item.Protocol.toLowerCase().includes(value) ||
-      item.PacketLength.toString().includes(value) ||
-      item.PacketType.toLowerCase().includes(value) ||
-      item.TrafficType.toLowerCase().includes(value) ||
-      item.Segment.toLowerCase().includes(value) ||
-      item.AnomalyScores.toLowerCase().includes(value) ||
-      item.LogSource.toLowerCase().includes(value)
-    ));
+    applyFiltersAndSearch(value, filters);
+  };
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    applyFiltersAndSearch(searchQuery, { ...filters, [name]: value });
+  };
+
+  const applyFiltersAndSearch = (searchValue, filterValues) => {
+    let filtered = data;
+
+    if (searchValue) {
+      filtered = filtered.filter(item => 
+        item.Timestamp.toLowerCase().includes(searchValue) ||
+        item.SourceIP.toLowerCase().includes(searchValue) ||
+        item.DestinationIP.toLowerCase().includes(searchValue) ||
+        item.SourcePort.toString().includes(searchValue) ||
+        item.DestinationPort.toString().includes(searchValue) ||
+        item.AttackType.toLowerCase().includes(searchValue) ||
+        item.AttackSignature.toLowerCase().includes(searchValue) ||
+        item.ActionTaken.toLowerCase().includes(searchValue) ||
+        item.SeverityLevel.toLowerCase().includes(searchValue) ||
+        item.UserInfo.toLowerCase().includes(searchValue) ||
+        item.DeviceInfo.toLowerCase().includes(searchValue) ||
+        item.GeoLocation.toLowerCase().includes(searchValue) ||
+        item.Protocol.toLowerCase().includes(searchValue) ||
+        item.PacketLength.toString().includes(searchValue) ||
+        item.PacketType.toLowerCase().includes(searchValue) ||
+        item.TrafficType.toLowerCase().includes(searchValue) ||
+        item.Segment.toLowerCase().includes(searchValue) ||
+        item.AnomalyScores.toLowerCase().includes(searchValue) ||
+        item.LogSource.toLowerCase().includes(searchValue)
+      );
+    }
+
+    if (filterValues.idFrom) {
+      filtered = filtered.filter(item => item.id >= parseInt(filterValues.idFrom));
+    }
+    if (filterValues.idTo) {
+      filtered = filtered.filter(item => item.id <= parseInt(filterValues.idTo));
+    }
+    if (filterValues.severity) {
+      filtered = filtered.filter(item => item.SeverityLevel.toLowerCase() === filterValues.severity.toLowerCase());
+    }
+    if (filterValues.protocol) {
+      filtered = filtered.filter(item => item.Protocol.toLowerCase() === filterValues.protocol.toLowerCase());
+    }
+
+    setFilteredData(filtered);
   };
 
   return (
     <div>
-      <h1>Cyber Geolocation Analysis</h1>
+      <h1>Cybersecurity Incidents Data</h1>
       <TextField 
         label="Search" 
         variant="outlined" 
         value={searchQuery} 
         onChange={handleSearch} 
-        style={{ marginBottom: '20px' }}
+        style={{ marginBottom: '20px', marginRight: '20px' }}
       />
+      <FormControl variant="outlined" style={{ marginBottom: '20px', marginRight: '20px', width: '200px' }}>
+        <InputLabel>AttackType</InputLabel>
+        <Select
+          name="AttackType"
+          value={filters.AttackType}
+          onChange={handleFilterChange}
+          label="AttackType"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value="malware">Malware</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl variant="outlined" style={{ marginBottom: '20px', marginRight: '20px', width: '200px' }}>
+        <InputLabel>Severity</InputLabel>
+        <Select
+          name="severity"
+          value={filters.severity}
+          onChange={handleFilterChange}
+          label="Severity"
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value="low">Low</MenuItem>
+          <MenuItem value="medium">Medium</MenuItem>
+          <MenuItem value="high">High</MenuItem>
+        </Select>
+      </FormControl>
       {error && <p>Error fetching data: {error.message}</p>}
       <TableContainer component={Paper}>
         <Table>
@@ -164,7 +236,8 @@ const AttacksTable = () => {
                   Timestamp
                 </TableSortLabel>
               </TableCell>
-              <TableCell sortDirection={sortConfig.key === 'SourceIP' ? sortConfig.direction : false}>
+              <TableCell sortDirection={sortConfig.key === 'SourceIP' ? sortConfig.direction
+                  : false}>
                 <TableSortLabel
                   active={sortConfig.key === 'SourceIP'}
                   direction={sortConfig.key === 'SourceIP' ? sortConfig.direction : 'asc'}
@@ -276,4 +349,3 @@ const AttacksTable = () => {
 };
 
 export default AttacksTable;
-

@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root', 
-  password: '', 
+  user: 'root', // replace with your own user
+  password: '', // replace with your own password
   database: 'web_traffic'
 });
 
@@ -33,6 +33,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   db.query('USE web_traffic', (err) => {
     if (err) throw err;
 
+    // Create attacker table
     const createAttackerTableQuery = `
       CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,6 +42,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
+    // Create victim table
     const createVictimTableQuery = `
       CREATE TABLE IF NOT EXISTS victim (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,6 +54,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
+    // Create network_traffic table
     const createNetworkTrafficTableQuery = `
       CREATE TABLE IF NOT EXISTS network_traffic (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,6 +66,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
+    // Create response table
     const createResponseTableQuery = `
       CREATE TABLE IF NOT EXISTS response (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -73,8 +77,9 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    const createAttackTableQuery = `
-      CREATE TABLE IF NOT EXISTS attack (
+    // Create incident table
+    const createIncidentTableQuery = `
+      CREATE TABLE IF NOT EXISTS incident (
         id INT AUTO_INCREMENT PRIMARY KEY,
         AttackType VARCHAR(255),
         Timestamp VARCHAR(255),
@@ -99,11 +104,12 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
             if (err) throw err;
             console.log('Response table created or already exists...');
             
-            db.query(createAttackTableQuery, (err, result) => {
+            db.query(createIncidentTableQuery, (err, result) => {
               if (err) throw err;
-              console.log('Attack table created or already exists...');
+              console.log('Incident table created or already exists...');
 
               const importCSV = () => {
+                // Path to the CSV file
                 const filePath = path.join(__dirname, '../shared/constants/test.csv');
                 const csvData = [];
 
@@ -111,10 +117,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
                   .pipe(csv())
                   .on('data', (row) => {
                     // Process each row and populate the tables
-                    const attackerRow = [
-                      row['Source IP Address'], 
-                      row['Source Port']
-                    ];
+                    const attackerRow = [row['Source IP Address'], row['Source Port']];
                     const victimRow = [
                       row['Destination IP Address'],
                       row['Destination Port'],
@@ -135,12 +138,12 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
                       row['Severity Level'],
                       row['Log Source']
                     ];
-                    const attackRow = [
+                    const incidentRow = [
                       row['Attack Type'],
                       row.Timestamp,
                       row['Attack Signature']
                     ];
-                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, attackRow });
+                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, incidentRow });
                   })
                   .on('end', () => {
                     console.log('CSV data:', csvData);
@@ -178,12 +181,12 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
                               if (err) throw err;
                               console.log('Response data imported...');
 
-                              const attackData = attackerIdMapping.map(row => row.attackRow);
-                              const insertAttackQuery = 'INSERT INTO attack (AttackType, Timestamp, AttackSignature) VALUES ?';
+                              const incidentData = attackerIdMapping.map(row => row.incidentRow);
+                              const insertIncidentQuery = 'INSERT INTO incident (AttackType, Timestamp, AttackSignature) VALUES ?';
 
-                              db.query(insertAttackQuery, [attackData], (err, result) => {
+                              db.query(insertIncidentQuery, [incidentData], (err, result) => {
                                 if (err) throw err;
-                                console.log('Attack data imported...');
+                                console.log('Incident data imported...');
                               });
                             });
                           });
@@ -206,16 +209,16 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
 
 app.get('/api/attacks', (req, res) => {
   const query = `
-    SELECT a.SourceIP, a.SourcePort,
+    SELECT i.id, i.AttackType, i.Timestamp, i.AttackSignature,
+           a.SourceIP, a.SourcePort,
            v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
            n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
-           r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource,
-           t.AttackType, t.Timestamp, t.AttackSignature
-    FROM attack t
-    JOIN response r ON t.id = r.id
-    JOIN network_traffic n ON t.id = n.id
-    JOIN victim v ON t.id = v.id
-    JOIN attacker a ON t.id = a.id
+           r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource
+    FROM incident i
+    JOIN attacker a ON i.id = a.id
+    JOIN victim v ON i.id = v.id
+    JOIN network_traffic n ON i.id = n.id
+    JOIN response r ON i.id = r.id
   `;
   db.query(query, (err, results) => {
     if (err) throw err;

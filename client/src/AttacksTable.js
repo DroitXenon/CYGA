@@ -102,7 +102,7 @@ const AttacksTable = () => {
 
   return (
     <div>
-      <h1>Cybersecurity Attacks Data</h1>
+      <h1>Cybersecurity Incidents Data</h1>
       {error && <p>Error fetching data: {error.message}</p>}
       <TableContainer component={Paper}>
         <Table>

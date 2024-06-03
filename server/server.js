@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -15,8 +14,8 @@ app.use(bodyParser.json());
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root', // replace with your own user
-  password: '', // replace with your own password
+  user: 'root', 
+  password: '', 
   database: 'web_traffic'
 });
 
@@ -34,7 +33,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   db.query('USE web_traffic', (err) => {
     if (err) throw err;
 
-    // Create attacker table
     const createAttackerTableQuery = `
       CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +41,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create victim table
     const createVictimTableQuery = `
       CREATE TABLE IF NOT EXISTS victim (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,7 +52,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create network_traffic table
     const createNetworkTrafficTableQuery = `
       CREATE TABLE IF NOT EXISTS network_traffic (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -67,7 +63,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create response table
     const createResponseTableQuery = `
       CREATE TABLE IF NOT EXISTS response (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +73,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create attack table
     const createAttackTableQuery = `
       CREATE TABLE IF NOT EXISTS attack (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -110,7 +104,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
               console.log('Attack table created or already exists...');
 
               const importCSV = () => {
-                // Path to the CSV file
                 const filePath = path.join(__dirname, '../shared/constants/test.csv');
                 const csvData = [];
 

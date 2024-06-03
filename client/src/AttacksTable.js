@@ -14,22 +14,26 @@ import {
   Card,
   CardContent,
   Typography,
-  Box
+  Box,
+  TextField
 } from '@mui/material';
 import { OpenAI } from 'openai';
 
 const AttacksTable = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'asc' });
   const [error, setError] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     axios.get('http://localhost:5001/api/attacks')
       .then(response => {
         console.log('Data fetched:', response.data);
         setData(response.data);
+        setFilteredData(response.data);
       })
       .catch(error => {
         console.error('There was an error fetching the data!', error);
@@ -87,7 +91,7 @@ const AttacksTable = () => {
   };
 
   const sortedData = React.useMemo(() => {
-    let sortableData = [...data];
+    let sortableData = [...filteredData];
     sortableData.sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'asc' ? -1 : 1;
@@ -98,11 +102,44 @@ const AttacksTable = () => {
       return 0;
     });
     return sortableData;
-  }, [data, sortConfig]);
+  }, [filteredData, sortConfig]);
+
+  const handleSearch = (event) => {
+    const value = event.target.value.toLowerCase();
+    setSearchQuery(value);
+    setFilteredData(data.filter(item => 
+      item.Timestamp.toLowerCase().includes(value) ||
+      item.SourceIP.toLowerCase().includes(value) ||
+      item.DestinationIP.toLowerCase().includes(value) ||
+      item.SourcePort.toString().includes(value) ||
+      item.DestinationPort.toString().includes(value) ||
+      item.AttackType.toLowerCase().includes(value) ||
+      item.AttackSignature.toLowerCase().includes(value) ||
+      item.ActionTaken.toLowerCase().includes(value) ||
+      item.SeverityLevel.toLowerCase().includes(value) ||
+      item.UserInfo.toLowerCase().includes(value) ||
+      item.DeviceInfo.toLowerCase().includes(value) ||
+      item.GeoLocation.toLowerCase().includes(value) ||
+      item.Protocol.toLowerCase().includes(value) ||
+      item.PacketLength.toString().includes(value) ||
+      item.PacketType.toLowerCase().includes(value) ||
+      item.TrafficType.toLowerCase().includes(value) ||
+      item.Segment.toLowerCase().includes(value) ||
+      item.AnomalyScores.toLowerCase().includes(value) ||
+      item.LogSource.toLowerCase().includes(value)
+    ));
+  };
 
   return (
     <div>
-      <h1>Cybersecurity Incidents Data</h1>
+      <h1>Cyber Geolocation Analysis</h1>
+      <TextField 
+        label="Search" 
+        variant="outlined" 
+        value={searchQuery} 
+        onChange={handleSearch} 
+        style={{ marginBottom: '20px' }}
+      />
       {error && <p>Error fetching data: {error.message}</p>}
       <TableContainer component={Paper}>
         <Table>
@@ -239,3 +276,4 @@ const AttacksTable = () => {
 };
 
 export default AttacksTable;
+

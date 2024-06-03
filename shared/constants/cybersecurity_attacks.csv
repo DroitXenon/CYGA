@@ -1,6 +1,0 @@
-Timestamp,Source IP Address,Attack Type,Destination IP Address,Severity Level
-2023-05-30 06:33:58,103.216.15.12,Malware,84.9.164.252,Low
-2023-05-30 07:45:12,104.236.16.14,DDoS,85.8.164.253,High
-2023-05-30 08:20:44,105.236.17.16,Ransomware,86.7.164.254,Medium
-2023-05-30 09:10:33,106.216.18.18,Phishing,87.6.164.255,Low
-2023-05-30 10:25:58,107.216.19.20,Trojan,88.5.164.256,High

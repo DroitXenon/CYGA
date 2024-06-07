@@ -177,21 +177,6 @@ const AttacksTable = () => {
         style={{ marginBottom: '20px', marginRight: '20px' }}
       />
       <FormControl variant="outlined" style={{ marginBottom: '20px', marginRight: '20px', width: '200px' }}>
-        <InputLabel>AttackType</InputLabel>
-        <Select
-          name="AttackType"
-          value={filters.AttackType}
-          onChange={handleFilterChange}
-          label="AttackType"
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value="malware">Malware</MenuItem>
-          <MenuItem value="trojan">Trojan</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl variant="outlined" style={{ marginBottom: '20px', marginRight: '20px', width: '200px' }}>
         <InputLabel>Severity</InputLabel>
         <Select
           name="severity"

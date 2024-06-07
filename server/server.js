@@ -110,7 +110,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
 
               const importCSV = () => {
                 // Path to the CSV file
-                const filePath = path.join(__dirname, '../shared/constants/test.csv');
+                const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
                 const csvData = [];
 
                 fs.createReadStream(filePath)

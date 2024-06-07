@@ -156,17 +156,11 @@ const AttacksTable = () => {
       );
     }
 
-    if (filterValues.idFrom) {
-      filtered = filtered.filter(item => item.id >= parseInt(filterValues.idFrom));
-    }
-    if (filterValues.idTo) {
-      filtered = filtered.filter(item => item.id <= parseInt(filterValues.idTo));
-    }
     if (filterValues.severity) {
       filtered = filtered.filter(item => item.SeverityLevel.toLowerCase() === filterValues.severity.toLowerCase());
     }
-    if (filterValues.protocol) {
-      filtered = filtered.filter(item => item.Protocol.toLowerCase() === filterValues.protocol.toLowerCase());
+    if (filterValues.attacktype) {
+      filtered = filtered.filter(item => item.AttackType.toLowerCase() === filterValues.attacktype.toLowerCase());
     }
 
     setFilteredData(filtered);
@@ -174,7 +168,7 @@ const AttacksTable = () => {
 
   return (
     <div>
-      <h1>Cybersecurity Incidents Data</h1>
+      <h1>Cyber Geolocation Analysis</h1>
       <TextField 
         label="Search" 
         variant="outlined" 
@@ -194,6 +188,7 @@ const AttacksTable = () => {
             <em>None</em>
           </MenuItem>
           <MenuItem value="malware">Malware</MenuItem>
+          <MenuItem value="trojan">Trojan</MenuItem>
         </Select>
       </FormControl>
       <FormControl variant="outlined" style={{ marginBottom: '20px', marginRight: '20px', width: '200px' }}>

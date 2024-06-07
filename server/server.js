@@ -14,9 +14,8 @@ app.use(bodyParser.json());
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root', // replace with your own user
-  password: '', // replace with your own password
-  database: 'web_traffic'
+  user: 'root', 
+  password: '', 
 });
 
 db.connect(err => {
@@ -33,7 +32,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   db.query('USE web_traffic', (err) => {
     if (err) throw err;
 
-    // Create attacker table
     const createAttackerTableQuery = `
       CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,7 +40,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create victim table
     const createVictimTableQuery = `
       CREATE TABLE IF NOT EXISTS victim (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,7 +51,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create network_traffic table
     const createNetworkTrafficTableQuery = `
       CREATE TABLE IF NOT EXISTS network_traffic (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +62,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create response table
     const createResponseTableQuery = `
       CREATE TABLE IF NOT EXISTS response (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +72,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Create incident table
     const createIncidentTableQuery = `
       CREATE TABLE IF NOT EXISTS incident (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -87,7 +81,6 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
       );
     `;
 
-    // Execute table creation queries
     db.query(createAttackerTableQuery, (err, result) => {
       if (err) throw err;
       console.log('Attacker table created or already exists...');
@@ -109,14 +102,12 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
               console.log('Incident table created or already exists...');
 
               const importCSV = () => {
-                // Path to the CSV file
                 const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
                 const csvData = [];
 
                 fs.createReadStream(filePath)
                   .pipe(csv())
                   .on('data', (row) => {
-                    // Process each row and populate the tables
                     const attackerRow = [row['Source IP Address'], row['Source Port']];
                     const victimRow = [
                       row['Destination IP Address'],

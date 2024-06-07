@@ -1,8 +1,9 @@
 # CYGA - Cyber Geolocation Analysis
+<div align="center">
+<img src="shared/constants/logo.png" alt="CYGA Logo" width="250"/>
+</div>
+Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed to show data and insights. CYGA offers a powerful platform to track, analyze, and respond to cyber threats with precision and efficiency. This project is a web application built with React and Material-UI on the front end, Node.js and Express on the back end, and MySQL for the database. 
 
-Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designed to show real-time data and insights. CYGA is designed for tracking, analyzing, and responding to cyber threats with precision and efficiency. This project is a web application built with React and Material-UI on the front end, Node.js and Express on the back end, and MySQL for the database. 
-
-<img src="shared/constants/logo.png" alt="CYGA Logo" width="300"/>
 
 ## Team Member
 * [Yiran Dong](https://github.com/Rileyyiran)
@@ -10,8 +11,30 @@ Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designe
 * [Yuqing Zhang](https://github.com/Yuqing-Zhang-branch)
 * [Justin Wang](https://github.com/DroitXenon)  
 
+## Files
+- **database** folder: Files required for C2 and C3
+- **client** folder: Files for front-end representation
+- **server** folder: Files for back-end and server.js is the code for connecting app and database.
+- **shared** folder: datasets, photos, etc.
+
+## Data Scheme
+
+<div align="center">
+<img src="shared/constants/erdiagram.jpeg"/>
+<img src="shared/constants/scheme.jpeg"/>
+</div>
+
 ## Features
 
+- **Search:** Enables users to quickly locate specific data in a cybersecurity database using queries like IP addresses, attack types, and incident IDs; results are displayed in an easily navigable table.
+
+- **Filter:** Allows users to refine search results by severity and attack type directly from the interface, providing quick access to relevant information for effective trend analysis and incident management.
+
+- **Select:** Allows users get AI-driven analysis and recommendations. Users check the boxes next to data entries and click the "Analysis" button. to receive AI-generated insights based on their selections. This makes data analysis easy and accessible.
+
+- **Sort:** The Sort feature allows users to organize data. By clicking the arrow next to any entity, users can sort the data alphabetically. This helps users quickly find and analyze information.
+
+    _Following features will be added in new version:_
 - **Timestamping:** Every event is recorded with a precise timestamp, ensuring that you can track the sequence of events down to the millisecond.
 
 - **Location Finding:** Quickly pinpoint the geographical origin of an attack with our advanced geolocation algorithms.
@@ -21,6 +44,17 @@ Welcome to the  repository for CYGA, the Cyber Geolocation Analysis tool designe
 - **Attack Analysis:** In-depth analysis of each attack helps you understand the attacker's methods and motives.
 
 - **Data Statistics:** Comprehensive statistics offer a macro and micro view of the cyber threat landscape, aiding in strategic decision-making.
+
+## Demo
+
+Website:
+<div align="center">
+<img src="shared/constants/demo.png"/>
+</div>
+Database:
+<div align="center">
+<img src="shared/constants/database.png"/>
+</div>
 
 ## Prerequisites
 - React for Front-end Development

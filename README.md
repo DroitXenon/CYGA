@@ -34,7 +34,7 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 
 - **Sort:** The Sort feature allows users to organize data. By clicking the arrow next to any entity, users can sort the data alphabetically. This helps users quickly find and analyze information.
 
-    _Following features will be added in new version:_
+    _Following features will be added in later version:_
 - **Timestamping:** Every event is recorded with a precise timestamp, ensuring that you can track the sequence of events down to the millisecond.
 
 - **Location Finding:** Quickly pinpoint the geographical origin of an attack with our advanced geolocation algorithms.
@@ -79,20 +79,13 @@ Database:
     npm install
     ```
 
-3. **Create the MySQL database:**
-
-    ```sql
-    CREATE DATABASE web_traffic;
-    ```
-
-4. **Update the MySQL connection details in `server.js`:**
+3. **Update the MySQL connection details in `server.js`:**
 
     ```javascript
     const db = mysql.createConnection({
       host: 'localhost',
-      user: 'Change to Your Own User',
-      password: 'Change to Your Own Password', 
-      database: 'web_traffic'
+      user: 'root', //Change to Your Own User Name
+      password: '', //Change to Your Own Password
     });
     ```
 
@@ -141,7 +134,6 @@ Database:
 3. Click on the column headers to sort the data.
 4. Select rows using the checkboxes.
 5. Click the "Analysis" button to analyze the selected rows using the OpenAI API.
-6. View the analysis results displayed below the table.
 
 ## Technologies Used
 

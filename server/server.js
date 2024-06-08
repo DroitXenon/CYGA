@@ -5,6 +5,7 @@ const mysql = require('mysql2');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
+const { userInfo } = require('os');
 
 const app = express();
 const port = 5001;
@@ -206,24 +207,101 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   });
 });
 
+const baseQuery = `
+  SELECT i.id, i.AttackType, i.Timestamp, i.AttackSignature,
+         a.SourceIP, a.SourcePort,
+         v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
+         n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
+         r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource
+  FROM incident i
+  JOIN response r ON i.responseId = r.id
+  JOIN network_traffic n ON r.networkTrafficId = n.id
+  JOIN victim v ON n.victimId = v.id
+  JOIN attacker a ON v.attackerId = a.id
+`;
+
 app.get('/api/attacks', (req, res) => {
-  const query = `
-    SELECT i.id, i.AttackType, i.Timestamp, i.AttackSignature,
-           a.SourceIP, a.SourcePort,
-           v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
-           n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
-           r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource
+  db.query(baseQuery, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+app.get('/api/search', (req, res) => {
+  const {incidentId, userInfo} = req.query;
+  let query = baseQuery + ` WHERE 1=1`;
+  const params = [];
+
+  if (incidentId) {
+    query += ` AND i.id = ?`;
+    params.push(incidentId);
+  }
+
+  if (userInfo) {
+    query += ` AND v.UserInfo = ?`;
+    params.push(userInfo);
+  }
+
+  db.query(query, params, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+app.get('/api/filter', (req, res) => {
+  const { severity, attackType } = req.query;
+  let query = baseQuery + ` WHERE 1=1`;
+  const params = [];
+
+  if (severity) {
+    query += ` AND r.SeverityLevel = ?`;
+    params.push(severity);
+  }
+  if (attackType) {
+    query += ` AND i.AttackType = ?`;
+    params.push(attackType);
+  }
+
+  db.query(query, params, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+app.get('/api/sort', (req, res) => {
+  const { column, order } = req.query;
+  const validColumns = ['id', 'AttackType', 'Timestamp', 'AttackSignature', 'SourceIP', 'SourcePort', 'DestinationIP', 'DestinationPort', 'SeverityLevel'];
+  const validOrder = ['ASC', 'DESC'];
+
+  if (!validColumns.includes(column) || !validOrder.includes(order)) {
+    return res.status(400).json({ error: 'Invalid sort parameters' });
+  }
+
+  const query = baseQuery + ` ORDER BY ?? ${order}`;
+  db.query(query, [column], (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+app.delete('/api/delete/:id', (req, res) => {
+  const { id } = req.params;
+  const deleteQuery = `
+    DELETE i, r, n, v, a
     FROM incident i
     JOIN response r ON i.responseId = r.id
     JOIN network_traffic n ON r.networkTrafficId = n.id
     JOIN victim v ON n.victimId = v.id
     JOIN attacker a ON v.attackerId = a.id
+    WHERE i.id = ?
   `;
-  db.query(query, (err, results) => {
+
+  db.query(deleteQuery, [id], (err, results) => {
     if (err) throw err;
-    res.json(results);
+    res.json({ message: 'Record deleted successfully' });
   });
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

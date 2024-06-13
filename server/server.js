@@ -207,8 +207,9 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   });
 });
 
+// Base query
 const baseQuery = `
-  SELECT *
+  SELECT i.*, r.*, n.*, v.*, a.*
   FROM incident i
   JOIN response r ON i.responseId = r.id
   JOIN network_traffic n ON r.networkTrafficId = n.id
@@ -216,54 +217,28 @@ const baseQuery = `
   JOIN attacker a ON v.attackerId = a.id
 `;
 
-app.get('/api/attacks', (req, res) => {
-  db.query(baseQuery, (err, results) => {
-    if (err) throw err;
-    res.json(results);
-  });
-});
-
+// Search feature
 app.get('/api/search', (req, res) => {
-  const {incidentId, userInfo} = req.query;
-  let query = baseQuery + ` WHERE 1=1`;
-  const params = [];
+  const { query } = req.query;
+  let searchQuery = baseQuery + ` WHERE 
+    i.AttackType LIKE ? OR 
+    i.AttackSignature LIKE ? OR 
+    r.ActionTaken LIKE ? OR 
+    v.UserInfo LIKE ? OR 
+    v.DeviceInfo LIKE ? OR 
+    a.SourceIP LIKE ? OR 
+    a.SourcePort LIKE ? OR 
+    v.DestinationIP LIKE ? OR 
+    v.DestinationPort LIKE ?`;
+  const params = Array(9).fill(`%${query}%`);
 
-  if (incidentId) {
-    query += ` AND i.id = ?`;
-    params.push(incidentId);
-  }
-
-  if (userInfo) {
-    query += ` AND v.UserInfo = ?`;
-    params.push(userInfo);
-  }
-
-  db.query(query, params, (err, results) => {
+  db.query(searchQuery, params, (err, results) => {
     if (err) throw err;
     res.json(results);
   });
 });
 
-app.get('/api/filter', (req, res) => {
-  const { severity, attackType } = req.query;
-  let query = baseQuery + ` WHERE 1=1`;
-  const params = [];
-
-  if (severity) {
-    query += ` AND r.SeverityLevel = ?`;
-    params.push(severity);
-  }
-  if (attackType) {
-    query += ` AND i.AttackType = ?`;
-    params.push(attackType);
-  }
-
-  db.query(query, params, (err, results) => {
-    if (err) throw err;
-    res.json(results);
-  });
-});
-
+// Sort feature
 app.get('/api/sort', (req, res) => {
   const { column, order } = req.query;
   const validColumns = ['id', 'AttackType', 'Timestamp', 'AttackSignature', 'SourceIP', 'SourcePort', 'DestinationIP', 'DestinationPort', 'SeverityLevel'];
@@ -280,6 +255,23 @@ app.get('/api/sort', (req, res) => {
   });
 });
 
+// Incident details page
+app.get('/api/incident/:id', (req, res) => {
+  const { id } = req.params;
+  const query = baseQuery + ` WHERE i.id = ?`;
+
+  db.query(query, [id], (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Analysis feature (placeholder)
+app.get('/api/incident/:id/analysis', (req, res) => {
+  res.json({ message: 'Analysis feature coming soon...' });
+});
+
+// Delete feature
 app.delete('/api/delete/:id', (req, res) => {
   const { id } = req.params;
   const deleteQuery = `
@@ -298,6 +290,78 @@ app.delete('/api/delete/:id', (req, res) => {
   });
 });
 
+// Add feature
+app.post('/api/add', (req, res) => {
+  const {
+    SourceIP, SourcePort,
+    DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation,
+    Protocol, PacketLength, PacketType, TrafficType, Segment,
+    AnomalyScores, ActionTaken, SeverityLevel, LogSource,
+    AttackType, Timestamp, AttackSignature
+  } = req.body;
+
+  db.beginTransaction((err) => {
+    if (err) throw err;
+
+    const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort) VALUES (?, ?)';
+    db.query(insertAttackerQuery, [SourceIP, SourcePort], (err, result) => {
+      if (err) {
+        return db.rollback(() => {
+          throw err;
+        });
+      }
+      const attackerId = result.insertId;
+
+      const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES (?, ?, ?, ?, ?, ?)';
+      db.query(insertVictimQuery, [DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId], (err, result) => {
+        if (err) {
+          return db.rollback(() => {
+            throw err;
+          });
+        }
+        const victimId = result.insertId;
+
+        const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId) VALUES (?, ?, ?, ?, ?, ?)';
+        db.query(insertNetworkTrafficQuery, [Protocol, PacketLength, PacketType, TrafficType, Segment, victimId], (err, result) => {
+          if (err) {
+            return db.rollback(() => {
+              throw err;
+            });
+          }
+          const networkTrafficId = result.insertId;
+
+          const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId) VALUES (?, ?, ?, ?, ?)';
+          db.query(insertResponseQuery, [AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId], (err, result) => {
+            if (err) {
+              return db.rollback(() => {
+                throw err;
+              });
+            }
+            const responseId = result.insertId;
+
+            const insertIncidentQuery = 'INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId) VALUES (?, ?, ?, ?)';
+            db.query(insertIncidentQuery, [AttackType, Timestamp, AttackSignature, responseId], (err, result) => {
+              if (err) {
+                return db.rollback(() => {
+                  throw err;
+                });
+              }
+
+              db.commit((err) => {
+                if (err) {
+                  return db.rollback(() => {
+                    throw err;
+                  });
+                }
+                res.json({ message: 'Record added successfully' });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

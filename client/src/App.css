@@ -65,6 +65,7 @@ body {
   border: 1px solid #ccc;
   padding: 10px;
   text-align: left;
+  cursor: pointer;
 }
 
 .incident-table th {
@@ -78,6 +79,7 @@ body {
 .incident-details {
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
 }
 
 .incident-details div {
@@ -85,6 +87,7 @@ body {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .incident-details div h3 {

@@ -207,7 +207,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
   });
 });
 
-// Base query
+// Base query for fetching all related data
 const baseQuery = `
   SELECT i.*, r.*, n.*, v.*, a.*
   FROM incident i
@@ -223,15 +223,15 @@ app.get('/api/search', (req, res) => {
   let searchQuery = baseQuery + ` WHERE 
     i.AttackType LIKE ? OR 
     i.AttackSignature LIKE ? OR 
-    i.Timestamp LIKE ? OR
     r.ActionTaken LIKE ? OR 
     v.UserInfo LIKE ? OR 
     v.DeviceInfo LIKE ? OR 
     a.SourceIP LIKE ? OR 
     a.SourcePort LIKE ? OR 
     v.DestinationIP LIKE ? OR 
-    v.DestinationPort LIKE ?`;
-  const params = Array(9).fill(`%${query}%`);
+    v.DestinationPort LIKE ? OR
+    i.Timestamp LIKE ?`;
+  const params = Array(10).fill(`%${query}%`);
 
   db.query(searchQuery, params, (err, results) => {
     if (err) throw err;
@@ -242,7 +242,7 @@ app.get('/api/search', (req, res) => {
 // Sort feature
 app.get('/api/sort', (req, res) => {
   const { column, order } = req.query;
-  const validColumns = ['id', 'AttackType', 'Timestamp', 'AttackSignature', 'SourceIP', 'SourcePort', 'DestinationIP', 'DestinationPort', 'SeverityLevel'];
+  const validColumns = ['Timestamp', 'AttackType', 'AttackSignature'];
   const validOrder = ['ASC', 'DESC'];
 
   if (!validColumns.includes(column) || !validOrder.includes(order)) {

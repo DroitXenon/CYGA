@@ -208,11 +208,7 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
 });
 
 const baseQuery = `
-  SELECT i.id, i.AttackType, i.Timestamp, i.AttackSignature,
-         a.SourceIP, a.SourcePort,
-         v.DestinationIP, v.DestinationPort, v.UserInfo, v.DeviceInfo, v.GeoLocation,
-         n.Protocol, n.PacketLength, n.PacketType, n.TrafficType, n.Segment,
-         r.AnomalyScores, r.ActionTaken, r.SeverityLevel, r.LogSource
+  SELECT *
   FROM incident i
   JOIN response r ON i.responseId = r.id
   JOIN network_traffic n ON r.networkTrafficId = n.id

@@ -1,3 +1,5 @@
+/* src/App.css */
+
 /* General styles */
 body {
   font-family: Arial, sans-serif;
@@ -36,18 +38,40 @@ body {
   overflow-y: auto;
 }
 
-.incident-list {
-  list-style: none;
-  padding: 0;
+.search-bar {
+  display: flex;
+  margin-bottom: 20px;
 }
 
-.incident-list li {
+.search-bar input {
+  flex-grow: 1;
   padding: 10px;
-  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+  font-size: 16px;
   cursor: pointer;
 }
 
-.incident-list li:hover {
+.incident-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.incident-table th,
+.incident-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.incident-table th {
+  background-color: #f4f4f4;
+}
+
+.incident-table tr:hover {
   background-color: #f0f0f0;
 }
 

@@ -2,13 +2,24 @@ import React from 'react';
 
 function IncidentList({ incidents, onIncidentClick }) {
   return (
-    <ul className="incident-list">
-      {incidents.map(incident => (
-        <li key={incident.id} onClick={() => onIncidentClick(incident)}>
-          Incident ID: {incident.id}, Attack Type: {incident.AttackType}
-        </li>
-      ))}
-    </ul>
+    <table className="incident-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Attack Type</th>
+          <th>Attack Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        {incidents.map(incident => (
+          <tr key={incident.id} onClick={() => onIncidentClick(incident)}>
+            <td>{incident.Timestamp}</td>
+            <td>{incident.AttackType}</td>
+            <td>{incident.AttackSignature}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 

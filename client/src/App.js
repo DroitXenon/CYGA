@@ -6,14 +6,18 @@ import IncidentDetails from './components/IncidentDetails';
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidentData, setIncidentData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Fetch incident data from the API
-    fetch('http://localhost:5001/api/attacks')
+    fetchIncidents();
+  }, []);
+
+  const fetchIncidents = (query = '') => {
+    fetch(`http://localhost:5001/api/search?query=${query}`)
       .then(response => response.json())
       .then(data => setIncidentData(data))
       .catch(error => console.error('Error fetching incident data:', error));
-  }, []);
+  };
 
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
@@ -21,6 +25,15 @@ function App() {
 
   const handleBackClick = () => {
     setSelectedIncident(null);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchIncidents(searchQuery);
   };
 
   return (
@@ -34,7 +47,18 @@ function App() {
         {selectedIncident ? (
           <IncidentDetails incident={selectedIncident} />
         ) : (
-          <IncidentList incidents={incidentData} onIncidentClick={handleIncidentClick} />
+          <>
+            <form className="search-bar" onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                placeholder="Search incidents..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              <button type="submit">Search</button>
+            </form>
+            <IncidentList incidents={incidentData} onIncidentClick={handleIncidentClick} />
+          </>
         )}
       </div>
     </div>

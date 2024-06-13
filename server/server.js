@@ -223,6 +223,7 @@ app.get('/api/search', (req, res) => {
   let searchQuery = baseQuery + ` WHERE 
     i.AttackType LIKE ? OR 
     i.AttackSignature LIKE ? OR 
+    i.Timestamp LIKE ? OR
     r.ActionTaken LIKE ? OR 
     v.UserInfo LIKE ? OR 
     v.DeviceInfo LIKE ? OR 

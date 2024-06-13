@@ -239,6 +239,13 @@ app.get('/api/search', (req, res) => {
   });
 });
 
+app.get('/api/incidents', (req, res) => {
+  db.query(baseQuery, (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
 // Sort feature
 app.get('/api/sort', (req, res) => {
   const { column, order } = req.query;

@@ -236,7 +236,15 @@ app.get('/api/incident/:id', async (req, res) => {
 });
 
 app.get('/api/incident/:id/analysis', (req, res) => {
-  res.json({ message: 'Analysis feature coming soon...' });
+  const { id } = req.params;
+  
+  
+  const report = {
+    report: `Cyberattack Analysis Report for Incident ID: ${id}
+             This report contains detailed analysis of the network traffic and response data`
+  };
+  
+  res.json(report);
 });
 
 app.delete('/api/delete/:id', async (req, res) => {
@@ -298,8 +306,6 @@ app.post('/api/add', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

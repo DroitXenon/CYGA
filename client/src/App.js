@@ -128,6 +128,7 @@ function App() {
             fetchIncidents={fetchIncidents}
             setIncidentData={setIncidentData}
             handleAddIncident={() => setIsAddModalOpen(true)}
+            handleDeleteIncidents={handleDeleteIncidents}
           />
         )}
       </Box>

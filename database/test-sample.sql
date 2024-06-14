@@ -78,4 +78,6 @@ JOIN response r ON i.responseId = r.id
 JOIN network_traffic n ON r.networkTrafficId = n.id
 JOIN victim v ON n.victimId = v.id
 JOIN attacker a ON v.attackerId = a.id
-WHERE i.id = ?;
+WHERE i.id = 2;
+    --(Can change 2 to the IID user want)
+

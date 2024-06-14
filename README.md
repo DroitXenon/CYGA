@@ -4,7 +4,6 @@
 </div>
 Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed to show data and insights. CYGA offers a powerful platform to track, analyze, and respond to cyber threats with precision and efficiency. This project is a web application built with React and Material-UI on the front end, Node.js and Express on the back end, and MySQL for the database. 
 
-
 ## Team Member
 * [Yiran Dong](https://github.com/Rileyyiran)
 * [Liang He](https://github.com/zaizaijiayou)

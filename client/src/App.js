@@ -127,15 +127,13 @@ function App() {
             selectedIncidentIds={selectedIncidentIds} 
             fetchIncidents={fetchIncidents}
             setIncidentData={setIncidentData}
+            handleAddIncident={() => setIsAddModalOpen(true)}
           />
         )}
       </Box>
       <Box sx={{ my: 2 }}>
         <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} sx={{ ml: 2 }}>
           Add
-        </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
-          Delete
         </Button>
       </Box>
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>

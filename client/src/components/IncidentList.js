@@ -95,12 +95,12 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
         <Button variant="contained" onClick={handleSearch}>
           Search
         </Button>
-        {/* <Button variant="contained" color="primary" onClick={handleAddModalOpen} sx={{ ml: 2 }}>
+        <Button variant="contained" color="primary" onClick={handleAddModalOpen} sx={{ ml: 2 }}>
           Add
         </Button>
         <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
           Delete
-        </Button> */}
+        </Button>
       </Box>
       <TableContainer component={Paper}>
         <Table>

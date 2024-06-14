@@ -234,6 +234,8 @@ app.get('/api/sort', async (req, res) => {
   }
 });
 
+openai.apiKey = process.env.OPENAI_API_KEY; 
+
 app.get('/api/incident/:id/analysis', async (req, res) => {
   const { id } = req.params;
   try {

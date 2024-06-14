@@ -1,10 +1,32 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box, Modal, Typography } from '@mui/material';
 
-function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, selectedIncidentIds, fetchIncidents, setIncidentData }) {
+function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, selectedIncidentIds, fetchIncidents, setIncidentData, handleAddIncident, handleDeleteIncidents }) {
   const [sortColumn, setSortColumn] = useState('Timestamp');
   const [sortOrder, setSortOrder] = useState('ASC');
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newIncident, setNewIncident] = useState({
+    SourceIP: '',
+    SourcePort: '',
+    DestinationIP: '',
+    DestinationPort: '',
+    UserInfo: '',
+    DeviceInfo: '',
+    GeoLocation: '',
+    Protocol: '',
+    PacketLength: '',
+    PacketType: '',
+    TrafficType: '',
+    Segment: '',
+    AnomalyScores: '',
+    ActionTaken: '',
+    SeverityLevel: '',
+    LogSource: '',
+    AttackType: '',
+    Timestamp: '',
+    AttackSignature: ''
+  });
 
   const handleSort = (column) => {
     const order = sortOrder === 'ASC' ? 'DESC' : 'ASC';
@@ -14,18 +36,50 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
   };
 
   const handleSearch = () => {
-    console.log('Search keyword:', searchKeyword);
     if (searchKeyword.trim() === '') {
       fetchIncidents();
     } else {
       fetch(`http://localhost:5001/api/search?keyword=${searchKeyword}`)
         .then(response => response.json())
         .then(data => {
-          console.log('Search results:', data);
           setIncidentData(Array.isArray(data) ? data : []);
         })
         .catch(error => console.error('Error searching incident data:', error));
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewIncident({ ...newIncident, [name]: value });
+  };
+
+  const handleAddModalOpen = () => setIsAddModalOpen(true);
+  const handleAddModalClose = () => setIsAddModalOpen(false);
+
+  const handleAddButtonClick = () => {
+    handleAddIncident(newIncident);
+    setIsAddModalOpen(false);
+    setNewIncident({
+      SourceIP: '',
+      SourcePort: '',
+      DestinationIP: '',
+      DestinationPort: '',
+      UserInfo: '',
+      DeviceInfo: '',
+      GeoLocation: '',
+      Protocol: '',
+      PacketLength: '',
+      PacketType: '',
+      TrafficType: '',
+      Segment: '',
+      AnomalyScores: '',
+      ActionTaken: '',
+      SeverityLevel: '',
+      LogSource: '',
+      AttackType: '',
+      Timestamp: '',
+      AttackSignature: ''
+    });
   };
 
   return (
@@ -41,6 +95,12 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
         <Button variant="contained" onClick={handleSearch}>
           Search
         </Button>
+        {/* <Button variant="contained" color="primary" onClick={handleAddModalOpen} sx={{ ml: 2 }}>
+          Add
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
+          Delete
+        </Button> */}
       </Box>
       <TableContainer component={Paper}>
         <Table>
@@ -100,6 +160,40 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Modal open={isAddModalOpen} onClose={handleAddModalClose}>
+        <Box
+          sx={{
+            p: 3,
+            mx: 'auto',
+            mt: 5,
+            maxWidth: 500,
+            maxHeight: '80vh',
+            overflow: 'auto',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Add New Incident
+          </Typography>
+          {Object.keys(newIncident).map((field) => (
+            <TextField
+              key={field}
+              label={field}
+              name={field}
+              value={newIncident[field]}
+              onChange={handleInputChange}
+              fullWidth
+              margin="normal"
+            />
+          ))}
+          <Button variant="contained" color="primary" onClick={handleAddButtonClick} sx={{ mt: 2 }}>
+            Add Incident
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }

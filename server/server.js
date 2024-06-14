@@ -8,7 +8,6 @@ const path = require('path');
 const csv = require('csv-parser');
 const openai = require('openai');
 
-
 const app = express();
 const port = process.env.PORT || 5001;
 
@@ -18,8 +17,7 @@ app.use(bodyParser.json());
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: 'web_traffic'
+  password: process.env.DB_PASSWORD,
 };
 
 let db;

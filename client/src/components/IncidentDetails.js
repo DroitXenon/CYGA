@@ -24,7 +24,7 @@ function IncidentDetails({ incident }) {
     <Box sx={{ textAlign: 'center', mt: 2 }}>
       <Typography variant="h4">Details</Typography>
       <Box className="incident-details" sx={{ textAlign: 'left', mt: 2 }}>
-        <Box>
+        <Box mt={2}>
           <Typography variant="h6">Attacker</Typography>
           <Typography>Source IP: {incident.SourceIP}</Typography>
           <Typography>Source Port: {incident.SourcePort}</Typography>

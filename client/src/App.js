@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, Paper, TextField } from '@mui/material';
+import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import IncidentList from './components/IncidentList';
@@ -108,7 +108,7 @@ function App() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Incident Dashboard
+            Dashboard
           </Typography>
           <IconButton color="inherit" onClick={handleBackClick}>
             <HomeIcon />
@@ -130,7 +130,14 @@ function App() {
           />
         )}
       </Box>
-
+      <Box sx={{ my: 2 }}>
+        <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} sx={{ ml: 2 }}>
+          Add
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
+          Delete
+        </Button>
+      </Box>
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <Box
           sx={{

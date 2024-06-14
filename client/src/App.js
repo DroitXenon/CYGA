@@ -102,7 +102,7 @@ function App() {
 
   return (
     <Container>
-      <AppBar position="static">
+      <AppBar position="absolute">
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <MenuIcon />
@@ -115,19 +115,21 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      {selectedIncident ? (
-        <IncidentDetails incident={selectedIncident} />
-      ) : (
-        <IncidentList 
-          incidents={incidentData} 
-          onIncidentClick={handleIncidentClick} 
-          onSort={handleSort} 
-          onSelectIncident={handleSelectIncident} 
-          selectedIncidentIds={selectedIncidentIds} 
-          fetchIncidents={fetchIncidents}
-          setIncidentData={setIncidentData}
-        />
-      )}
+      <Box sx={{ mt: 12 }}>
+        {selectedIncident ? (
+          <IncidentDetails incident={selectedIncident} />
+        ) : (
+          <IncidentList 
+            incidents={incidentData} 
+            onIncidentClick={handleIncidentClick} 
+            onSort={handleSort} 
+            onSelectIncident={handleSelectIncident} 
+            selectedIncidentIds={selectedIncidentIds} 
+            fetchIncidents={fetchIncidents}
+            setIncidentData={setIncidentData}
+          />
+        )}
+      </Box>
 
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <Box
@@ -144,7 +146,7 @@ function App() {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Add New Incident
+            Add
           </Typography>
           {Object.keys(newIncident).map((field) => (
             <TextField

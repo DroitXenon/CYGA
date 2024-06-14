@@ -82,11 +82,11 @@ Database:
 3. **Update the MySQL connection details in `server.js`:**
 
     ```javascript
-    const db = mysql.createConnection({
-      host: 'localhost',
-      user: 'root', //Change to Your Own User Name
-      password: '', //Change to Your Own Password
-    });
+    const dbConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root', //Change to Your Own User Name
+        password: process.env.DB_PASSWORD,  //Change to Your Own Password
+    };
     ```
 
 5. **Start the backend server:**
@@ -106,7 +106,7 @@ Database:
 2. **Update the OpenAI API Key in `server.js`:**
 
     ```javascript
-    const openai = new OpenAI({ apiKey: 'Replace with your own API key', dangerouslyAllowBrowser: true });;
+    openai.apiKey = process.env.OPENAI_API_KEY; //Replace with your own API key
     ```
 
 2. **Install the dependencies:**
@@ -115,7 +115,7 @@ Database:
     npm install
     ```
 
-2. **Install the Material-UI:**
+2. **Install the Material-UI Interface:**
 
     ```bash
     npm install @mui/material @mui/styled-engine @emotion/react @emotion/styled
@@ -129,11 +129,14 @@ Database:
 
 ## Usage
 
-1. Open your browser and go to `http://localhost:3000`.
-2. View the cybersecurity attack data in the table.
-3. Click on the column headers to sort the data.
-4. Select rows using the checkboxes.
-5. Click the "Analysis" button to analyze the selected rows using the OpenAI API.
+1. Open the browser and go to `http://localhost:3000`.
+2. View the cyber attack incidents in the table.
+3. Search the data by entering keywords in the search bar and pressing the [SEARCH] button.
+4. Users can click on the column headers to sort the data.
+5. Add data by clicking the [ADD] button and filling in the needed data and pressing [ADD] at the bottom.
+6. Select the row using the checkboxes, and delete using the [DELETE] button.
+7. Click on any incident bar, and the user will be automatically redirected to the detail page.
+8. Click the "Analysis" button to analyze the selected rows using the OpenAI API.
 
 ## Technologies Used
 

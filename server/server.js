@@ -6,6 +6,8 @@ const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
+const openai = require('openai');
+
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -235,16 +237,76 @@ app.get('/api/incident/:id', async (req, res) => {
   }
 });
 
-app.get('/api/incident/:id/analysis', (req, res) => {
+
+app.get('/api/incident/:id/analysis', async (req, res) => {
   const { id } = req.params;
-  
-  
+
   const report = {
-    report: `Cyberattack Analysis Report for Incident ID: ${id}
-             This report contains detailed analysis of the network traffic and response data`
+    report: `Report for Incident ID: ${id}, The incident underscores the need for robust intrusion detection systems, regular security assessments, and employee training to mitigate and respond to such threats effectively.`
   };
   
   res.json(report);
+
+  openai.apiKey = process.env.OPENAI_API_KEY;
+
+  // Fetch incident details from the database
+  db.query(`${baseQuery} WHERE i.id = ?`, [id], async (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    const incident = results[0];
+
+    // Create a prompt for the OpenAI API
+    const prompt = `
+      Analyze the following incident data and generate a detailed cyberattack report:
+      
+      Attacker:
+      - Source IP: ${incident.SourceIP}
+      - Source Port: ${incident.SourcePort}
+      
+      Victim:
+      - Target IP: ${incident.DestinationIP}
+      - Target Port: ${incident.DestinationPort}
+      - User Information: ${incident.UserInfo}
+      - Geolocation: ${incident.GeoLocation}
+      
+      Network Traffic:
+      - Protocol: ${incident.Protocol}
+      - Packet Length: ${incident.PacketLength}
+      - Packet Type: ${incident.PacketType}
+      - Traffic Type: ${incident.TrafficType}
+      - Segment: ${incident.Segment}
+      
+      Response:
+      - Anomaly Scores: ${incident.AnomalyScores}
+      - Action Taken: ${incident.ActionTaken}
+      - Severity Level: ${incident.SeverityLevel}
+      - Log Source: ${incident.LogSource}
+      
+      Provide a comprehensive analysis of the network traffic and response data, and offer insights into the nature of the attack and recommended mitigation steps.
+    `;
+
+    try {
+      // Call OpenAI API
+      const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "You are a cybersecurity analyst." },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+      });
+
+      const report = response.choices[0].text.trim();
+
+      res.json({ report });
+    } catch (error) {
+      console.error('Error generating analysis report:', error);
+      res.status(500).json({ error: 'Error generating analysis report' });
+    }
+  });
 });
 
 app.delete('/api/delete/:id', async (req, res) => {

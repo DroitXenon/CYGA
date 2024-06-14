@@ -9,7 +9,7 @@ const csv = require('csv-parser');
 const openai = require('openai');
 
 const app = express();
-const port = process.env.PORT || 5001;
+const port = 5001;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -30,8 +30,8 @@ async function initializeDatabase() {
       password: dbConfig.password
     });
 
-    await db.query('CREATE DATABASE IF NOT EXISTS web_traffic');
-    await db.query('USE web_traffic');
+    await db.query('CREATE DATABASE IF NOT EXISTS cyga;');
+    await db.query('USE cyga;');
 
     const tableQueries = [
       `CREATE TABLE IF NOT EXISTS attacker (
@@ -163,7 +163,7 @@ initializeDatabase();
 
 // Base query
 const baseQuery = `
-  SELECT i.*, r.*, n.*, v.*, a.*
+  SELECT *
   FROM incident i
   JOIN response r ON i.responseId = r.id
   JOIN network_traffic n ON r.networkTrafficId = n.id
@@ -177,6 +177,18 @@ app.get('/api/incidents', async (req, res) => {
     res.json(results);
   } catch (err) {
     console.error('Error fetching incidents:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/incident/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const query = `${baseQuery} WHERE i.id = ?`;
+    const [results] = await db.query(query, [id]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error fetching incident:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -222,88 +234,57 @@ app.get('/api/sort', async (req, res) => {
   }
 });
 
-app.get('/api/incident/:id', async (req, res) => {
+app.get('/api/incident/:id/analysis', async (req, res) => {
   const { id } = req.params;
   try {
-    const query = `${baseQuery} WHERE i.id = ?`;
+    const query = `
+      SELECT *,
+        CASE
+          WHEN n.PacketLength < 500 THEN 'Low'
+          WHEN n.PacketLength BETWEEN 500 AND 1000 THEN 'Medium'
+          ELSE 'High'
+        END AS ReportLevel
+      FROM incident i
+      JOIN response r ON i.responseId = r.id
+      JOIN network_traffic n ON r.networkTrafficId = n.id
+      JOIN victim v ON n.victimId = v.id
+      JOIN attacker a ON v.attackerId = a.id
+      WHERE i.id = ?
+    `;
     const [results] = await db.query(query, [id]);
-    res.json(results);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Incident not found' });
+    }
+
+    const incident = results[0];
+    const reportLevel = incident.ReportLevel;
+
+    let reportStatement;
+    switch (reportLevel) {
+      case 'Low':
+        reportStatement = `The incident has a low severity level based on the network traffic packet length. It is recommended to review the traffic and ensure no unusual patterns are ignored.`;
+        break;
+      case 'Medium':
+        reportStatement = `The incident has a medium severity level based on the network traffic packet length. Further investigation is required to determine if there is any malicious activity.`;
+        break;
+      case 'High':
+        reportStatement = `The incident has a high severity level based on the network traffic packet length. Immediate action is required to mitigate potential threats and protect the network.`;
+        break;
+      default:
+        reportStatement = `The severity level of the incident could not be determined. Please review the incident manually.`;
+    }
+
+    const report = {
+      report: `Report for Incident ID: ${id}. ${reportStatement}`
+    };
+
+    res.json(report);
   } catch (err) {
-    console.error('Error fetching incident:', err);
+    console.error('Error generating analysis report:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-
-app.get('/api/incident/:id/analysis', async (req, res) => {
-  const { id } = req.params;
-
-  const report = {
-    report: `Report for Incident ID: ${id}, The incident underscores the need for robust intrusion detection systems, regular security assessments, and employee training to mitigate and respond to such threats effectively.`
-  };
-  
-  res.json(report);
-
-  openai.apiKey = process.env.OPENAI_API_KEY;
-
-  // Fetch incident details from the database
-  db.query(`${baseQuery} WHERE i.id = ?`, [id], async (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-
-    const incident = results[0];
-
-    // Create a prompt for the OpenAI API
-    const prompt = `
-      Analyze the following incident data and generate a detailed cyberattack report:
-      
-      Attacker:
-      - Source IP: ${incident.SourceIP}
-      - Source Port: ${incident.SourcePort}
-      
-      Victim:
-      - Target IP: ${incident.DestinationIP}
-      - Target Port: ${incident.DestinationPort}
-      - User Information: ${incident.UserInfo}
-      - Geolocation: ${incident.GeoLocation}
-      
-      Network Traffic:
-      - Protocol: ${incident.Protocol}
-      - Packet Length: ${incident.PacketLength}
-      - Packet Type: ${incident.PacketType}
-      - Traffic Type: ${incident.TrafficType}
-      - Segment: ${incident.Segment}
-      
-      Response:
-      - Anomaly Scores: ${incident.AnomalyScores}
-      - Action Taken: ${incident.ActionTaken}
-      - Severity Level: ${incident.SeverityLevel}
-      - Log Source: ${incident.LogSource}
-      
-      Provide a comprehensive analysis of the network traffic and response data, and offer insights into the nature of the attack and recommended mitigation steps.
-    `;
-
-    try {
-      const response = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "You are a cybersecurity analyst." },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-      });
-
-      const report = response.choices[0].text.trim();
-
-      res.json({ report });
-    } catch (error) {
-      console.error('Error generating analysis report:', error);
-      res.status(500).json({ error: 'Error generating analysis report' });
-    }
-  });
-});
 
 app.delete('/api/delete/:id', async (req, res) => {
   const { id } = req.params;

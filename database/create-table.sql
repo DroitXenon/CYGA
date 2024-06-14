@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS test;
+USE test;
 
 CREATE TABLE IF NOT EXISTS attacker (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -5,14 +7,15 @@ CREATE TABLE IF NOT EXISTS attacker (
     SourcePort INT
 );
 
-CREATE TABLE IF NOT EXISTS response (
+CREATE TABLE IF NOT EXISTS victim (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    AnomalyScores VARCHAR(255),
-    ActionTaken VARCHAR(255),
-    SeverityLevel VARCHAR(255),
-    LogSource VARCHAR(255),
-    networkTrafficId INT,
-    FOREIGN KEY (networkTrafficId) REFERENCES network_traffic(id)
+    DestinationIP VARCHAR(255),
+    DestinationPort INT,
+    UserInfo VARCHAR(255),
+    DeviceInfo VARCHAR(255),
+    GeoLocation VARCHAR(255),
+    attackerId INT,
+    FOREIGN KEY (attackerId) REFERENCES attacker(id)
 );
 
 CREATE TABLE IF NOT EXISTS network_traffic (
@@ -26,15 +29,14 @@ CREATE TABLE IF NOT EXISTS network_traffic (
     FOREIGN KEY (victimId) REFERENCES victim(id)
 );
 
-CREATE TABLE IF NOT EXISTS victim (
+CREATE TABLE IF NOT EXISTS response (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    DestinationIP VARCHAR(255),
-    DestinationPort INT,
-    UserInfo VARCHAR(255),
-    DeviceInfo VARCHAR(255),
-    GeoLocation VARCHAR(255),
-    attackerId INT,
-    FOREIGN KEY (attackerId) REFERENCES attacker(id)
+    AnomalyScores VARCHAR(255),
+    ActionTaken VARCHAR(255),
+    SeverityLevel VARCHAR(255),
+    LogSource VARCHAR(255),
+    networkTrafficId INT,
+    FOREIGN KEY (networkTrafficId) REFERENCES network_traffic(id)
 );
 
 CREATE TABLE IF NOT EXISTS incident (

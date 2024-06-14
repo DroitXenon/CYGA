@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box, Typography } from '@mui/material';
 
-function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, selectedIncidentIds, fetchIncidents, setIncidentData, handleDeleteIncidents }) {
+function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, selectedIncidentIds, fetchIncidents, setIncidentData, handleAddIncident, handleDeleteIncidents }) {
   const [sortColumn, setSortColumn] = useState('Timestamp');
   const [sortOrder, setSortOrder] = useState('ASC');
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -39,6 +39,9 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
         />
         <Button variant="contained" onClick={handleSearch}>
           Search
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ ml: 2 }}>
+          Add
         </Button>
         <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
           Delete
@@ -102,7 +105,6 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
           </TableBody>
         </Table>
       </TableContainer>
-
     </Box>
   );
 }

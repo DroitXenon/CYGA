@@ -132,11 +132,6 @@ function App() {
           />
         )}
       </Box>
-      <Box sx={{ my: 2 }}>
-        <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} sx={{ ml: 2 }}>
-          Add
-        </Button>
-      </Box>
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <Box
           sx={{

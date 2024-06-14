@@ -163,7 +163,7 @@ async function bulkInsert(table, columns, rows) {
 
 initializeDatabase();
 
-// Base query for fetching all related data
+// Base query
 const baseQuery = `
   SELECT i.*, r.*, n.*, v.*, a.*
   FROM incident i
@@ -183,7 +183,6 @@ app.get('/api/incidents', async (req, res) => {
   }
 });
 
-// Search endpoint
 app.get('/api/search', async (req, res) => {
   const { keyword } = req.query;
   if (!keyword) {
@@ -288,7 +287,6 @@ app.get('/api/incident/:id/analysis', async (req, res) => {
     `;
 
     try {
-      // Call OpenAI API
       const response = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [

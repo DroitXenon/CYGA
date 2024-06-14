@@ -21,34 +21,37 @@ function IncidentDetails({ incident }) {
   };
 
   return (
-    <div className="incident-details">
-      <div>
-        <h3>Attacker</h3>
-        <p>Source IP: {incident.SourceIP}</p>
-        <p>Source Port: {incident.SourcePort}</p>
-      </div>
-      <div>
-        <h3>Victim</h3>
-        <p>Target IP: {incident.DestinationIP}</p>
-        <p>Target Port: {incident.DestinationPort}</p>
-        <p>User Information: {incident.UserInfo}</p>
-        <p>Geolocation: {incident.GeoLocation}</p>
-      </div>
-      <div>
-        <h3>Network Traffic</h3>
-        <p>Protocol: {incident.Protocol}</p>
-        <p>Packet Length: {incident.PacketLength}</p>
-        <p>Packet Type: {incident.PacketType}</p>
-        <p>Traffic Type: {incident.TrafficType}</p>
-        <p>Segment: {incident.Segment}</p>
-      </div>
-      <div>
-        <h3>Response</h3>
-        <p>Anomaly Scores: {incident.AnomalyScores}</p>
-        <p>Action Taken: {incident.ActionTaken}</p>
-        <p>Severity Level: {incident.SeverityLevel}</p>
-        <p>Log Source: {incident.LogSource}</p>
-      </div>
+    <Box sx={{ textAlign: 'center', mt: 2 }}>
+      <Typography variant="h4">Details</Typography>
+      <Box className="incident-details" sx={{ textAlign: 'left', mt: 2 }}>
+        <Box>
+          <Typography variant="h6">Attacker</Typography>
+          <Typography>Source IP: {incident.SourceIP}</Typography>
+          <Typography>Source Port: {incident.SourcePort}</Typography>
+        </Box>
+        <Box mt={2}>
+          <Typography variant="h6">Victim</Typography>
+          <Typography>Target IP: {incident.DestinationIP}</Typography>
+          <Typography>Target Port: {incident.DestinationPort}</Typography>
+          <Typography>User Information: {incident.UserInfo}</Typography>
+          <Typography>Geolocation: {incident.GeoLocation}</Typography>
+        </Box>
+        <Box mt={2}>
+          <Typography variant="h6">Network Traffic</Typography>
+          <Typography>Protocol: {incident.Protocol}</Typography>
+          <Typography>Packet Length: {incident.PacketLength}</Typography>
+          <Typography>Packet Type: {incident.PacketType}</Typography>
+          <Typography>Traffic Type: {incident.TrafficType}</Typography>
+          <Typography>Segment: {incident.Segment}</Typography>
+        </Box>
+        <Box mt={2}>
+          <Typography variant="h6">Response</Typography>
+          <Typography>Anomaly Scores: {incident.AnomalyScores}</Typography>
+          <Typography>Action Taken: {incident.ActionTaken}</Typography>
+          <Typography>Severity Level: {incident.SeverityLevel}</Typography>
+          <Typography>Log Source: {incident.LogSource}</Typography>
+        </Box>
+      </Box>
       <Button variant="contained" color="primary" onClick={handleAnalyze} sx={{ mt: 2 }}>
         Analysis
       </Button>
@@ -82,7 +85,7 @@ function IncidentDetails({ incident }) {
           </Button>
         </Box>
       </Modal>
-    </div>
+    </Box>
   );
 }
 

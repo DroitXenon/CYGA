@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, TextField, Button, IconButton, Box, Modal, Paper, Checkbox } from '@mui/material';
+import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, Paper, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import IncidentList from './components/IncidentList';
@@ -9,7 +9,6 @@ import './App.css';
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidentData, setIncidentData] = useState([]);
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newIncident, setNewIncident] = useState({
     SourceIP: '',
@@ -58,21 +57,6 @@ function App() {
       .then(response => response.json())
       .then(data => setIncidentData(Array.isArray(data) ? data : []))
       .catch(error => console.error('Error sorting incident data:', error));
-  };
-
-  const handleSearch = () => {
-    console.log('Search keyword:', searchKeyword);
-    if (searchKeyword.trim() === '') {
-      fetchIncidents();
-    } else {
-      fetch(`http://localhost:5001/api/search?keyword=${searchKeyword}`)
-        .then(response => response.json())
-        .then(data => {
-          console.log('Search results:', data);
-          setIncidentData(Array.isArray(data) ? data : []);
-        })
-        .catch(error => console.error('Error searching incident data:', error));
-    }
   };
 
   const handleAddIncident = () => {
@@ -124,35 +108,25 @@ function App() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Data Dashboard
+            Incident Dashboard
           </Typography>
           <IconButton color="inherit" onClick={handleBackClick}>
             <HomeIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Box sx={{ my: 2 }}>
-        <TextField
-          variant="outlined"
-          placeholder="Search..."
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          sx={{ mr: 2 }}
-        />
-        <Button variant="contained" onClick={handleSearch}>
-          Search
-        </Button>
-        <Button variant="contained" color="primary" onClick={() => setIsAddModalOpen(true)} sx={{ ml: 2 }}>
-          Add
-        </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
-          Delete
-        </Button>
-      </Box>
       {selectedIncident ? (
         <IncidentDetails incident={selectedIncident} />
       ) : (
-        <IncidentList incidents={incidentData} onIncidentClick={handleIncidentClick} onSort={handleSort} onSelectIncident={handleSelectIncident} selectedIncidentIds={selectedIncidentIds} />
+        <IncidentList 
+          incidents={incidentData} 
+          onIncidentClick={handleIncidentClick} 
+          onSort={handleSort} 
+          onSelectIncident={handleSelectIncident} 
+          selectedIncidentIds={selectedIncidentIds} 
+          fetchIncidents={fetchIncidents}
+          setIncidentData={setIncidentData}
+        />
       )}
 
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>

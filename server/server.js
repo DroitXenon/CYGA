@@ -1,48 +1,45 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const { userInfo } = require('os');
 
 const app = express();
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root', 
-  password: '', 
-});
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: 'web_traffic'
+};
 
-db.connect(err => {
-  if (err) {
-    throw err;
-  }
-  console.log('MySQL connected...');
-});
+let db;
 
-db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
-  if (err) throw err;
-  console.log('Database created or already exists...');
+async function initializeDatabase() {
+  try {
+    db = await mysql.createConnection({
+      host: dbConfig.host,
+      user: dbConfig.user,
+      password: dbConfig.password
+    });
 
-  db.query('USE web_traffic', (err) => {
-    if (err) throw err;
-    
-    const createAttackerTableQuery = `
-      CREATE TABLE IF NOT EXISTS attacker (
+    await db.query('CREATE DATABASE IF NOT EXISTS web_traffic');
+    await db.query('USE web_traffic');
+
+    const tableQueries = [
+      `CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
         SourceIP VARCHAR(255),
         SourcePort INT
-      );
-    `;
-
-    const createVictimTableQuery = `
-      CREATE TABLE IF NOT EXISTS victim (
+      );`,
+      `CREATE TABLE IF NOT EXISTS victim (
         id INT AUTO_INCREMENT PRIMARY KEY,
         DestinationIP VARCHAR(255),
         DestinationPort INT,
@@ -51,11 +48,8 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
         GeoLocation VARCHAR(255),
         attackerId INT,
         FOREIGN KEY (attackerId) REFERENCES attacker(id)
-      );
-    `;
-
-    const createNetworkTrafficTableQuery = `
-      CREATE TABLE IF NOT EXISTS network_traffic (
+      );`,
+      `CREATE TABLE IF NOT EXISTS network_traffic (
         id INT AUTO_INCREMENT PRIMARY KEY,
         Protocol VARCHAR(255),
         PacketLength INT,
@@ -64,11 +58,8 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
         Segment VARCHAR(255),
         victimId INT,
         FOREIGN KEY (victimId) REFERENCES victim(id)
-      );
-    `;
-
-    const createResponseTableQuery = `
-      CREATE TABLE IF NOT EXISTS response (
+      );`,
+      `CREATE TABLE IF NOT EXISTS response (
         id INT AUTO_INCREMENT PRIMARY KEY,
         AnomalyScores VARCHAR(255),
         ActionTaken VARCHAR(255),
@@ -76,136 +67,99 @@ db.query('CREATE DATABASE IF NOT EXISTS web_traffic', (err) => {
         LogSource VARCHAR(255),
         networkTrafficId INT,
         FOREIGN KEY (networkTrafficId) REFERENCES network_traffic(id)
-      );
-    `;
-
-    const createIncidentTableQuery = `
-      CREATE TABLE IF NOT EXISTS incident (
+      );`,
+      `CREATE TABLE IF NOT EXISTS incident (
         id INT AUTO_INCREMENT PRIMARY KEY,
         AttackType VARCHAR(255),
         Timestamp VARCHAR(255),
         AttackSignature VARCHAR(255),
         responseId INT,
         FOREIGN KEY (responseId) REFERENCES response(id)
-      );
-    `;
+      );`
+    ];
 
-    db.query(createAttackerTableQuery, (err, result) => {
-      if (err) throw err;
-      console.log('Attacker table created or already exists...');
-      
-      db.query(createVictimTableQuery, (err, result) => {
-        if (err) throw err;
-        console.log('Victim table created or already exists...');
-        
-        db.query(createNetworkTrafficTableQuery, (err, result) => {
-          if (err) throw err;
-          console.log('Network Traffic table created or already exists...');
-          
-          db.query(createResponseTableQuery, (err, result) => {
-            if (err) throw err;
-            console.log('Response table created or already exists...');
-            
-            db.query(createIncidentTableQuery, (err, result) => {
-              if (err) throw err;
-              console.log('Incident table created or already exists...');
+    for (const query of tableQueries) {
+      await db.execute(query);
+    }
 
-              const importCSV = () => {
-                const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
-                const csvData = [];
+    console.log('Database initialized and tables created...');
+    importCSV();
+  } catch (err) {
+    console.error('Error initializing database:', err);
+  }
+}
 
-                fs.createReadStream(filePath)
-                  .pipe(csv())
-                  .on('data', (row) => {
-                    const attackerRow = [row['Source IP Address'], row['Source Port']];
-                    const victimRow = [
-                      row['Destination IP Address'],
-                      row['Destination Port'],
-                      row['User Information'],
-                      row['Device Information'],
-                      row['Geo-location Data']
-                    ];
-                    const networkTrafficRow = [
-                      row.Protocol,
-                      row['Packet Length'],
-                      row['Packet Type'],
-                      row['Traffic Type'],
-                      row['Network Segment']
-                    ];
-                    const responseRow = [
-                      row['Anomaly Scores'],
-                      row['Action Taken'],
-                      row['Severity Level'],
-                      row['Log Source']
-                    ];
-                    const incidentRow = [
-                      row['Attack Type'],
-                      row.Timestamp,
-                      row['Attack Signature']
-                    ];
-                    csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, incidentRow });
-                  })
-                  .on('end', () => {
-                    console.log('CSV data:', csvData);
-                    if (csvData.length > 0) {
-                      const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort) VALUES ?';
-                      const attackerData = csvData.map(row => row.attackerRow);
+async function importCSV() {
+  try {
+    const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
+    const csvData = [];
 
-                      db.query(insertAttackerQuery, [attackerData], (err, result) => {
-                        if (err) throw err;
-                        console.log('Attacker data imported...');
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (row) => {
+        const attackerRow = [row['Source IP Address'], row['Source Port']];
+        const victimRow = [
+          row['Destination IP Address'],
+          row['Destination Port'],
+          row['User Information'],
+          row['Device Information'],
+          row['Geo-location Data']
+        ];
+        const networkTrafficRow = [
+          row.Protocol,
+          row['Packet Length'],
+          row['Packet Type'],
+          row['Traffic Type'],
+          row['Network Segment']
+        ];
+        const responseRow = [
+          row['Anomaly Scores'],
+          row['Action Taken'],
+          row['Severity Level'],
+          row['Log Source']
+        ];
+        const incidentRow = [
+          row['Attack Type'],
+          row.Timestamp,
+          row['Attack Signature']
+        ];
+        csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, incidentRow });
+      })
+      .on('end', async () => {
+        console.log('CSV data:', csvData);
+        if (csvData.length > 0) {
+          try {
+            await db.beginTransaction();
 
-                        const attackerIdMapping = csvData.map((row, index) => ({
-                          ...row,
-                          attackerId: result.insertId + index
-                        }));
+            const attackerIds = await bulkInsert('attacker', ['SourceIP', 'SourcePort'], csvData.map(row => row.attackerRow));
+            const victimIds = await bulkInsert('victim', ['DestinationIP', 'DestinationPort', 'UserInfo', 'DeviceInfo', 'GeoLocation', 'attackerId'], csvData.map((row, index) => [...row.victimRow, attackerIds[index]]));
+            const networkTrafficIds = await bulkInsert('network_traffic', ['Protocol', 'PacketLength', 'PacketType', 'TrafficType', 'Segment', 'victimId'], csvData.map((row, index) => [...row.networkTrafficRow, victimIds[index]]));
+            const responseIds = await bulkInsert('response', ['AnomalyScores', 'ActionTaken', 'SeverityLevel', 'LogSource', 'networkTrafficId'], csvData.map((row, index) => [...row.responseRow, networkTrafficIds[index]]));
+            await bulkInsert('incident', ['AttackType', 'Timestamp', 'AttackSignature', 'responseId'], csvData.map((row, index) => [...row.incidentRow, responseIds[index]]));
 
-                        const victimData = attackerIdMapping.map(row => [...row.victimRow, row.attackerId]);
-                        const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES ?';
-
-                        db.query(insertVictimQuery, [victimData], (err, result) => {
-                          if (err) throw err;
-                          console.log('Victim data imported...');
-
-                          const networkTrafficData = attackerIdMapping.map(row => [...row.networkTrafficRow, row.attackerId]);
-                          const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId) VALUES ?';
-
-                          db.query(insertNetworkTrafficQuery, [networkTrafficData], (err, result) => {
-                            if (err) throw err;
-                            console.log('Network Traffic data imported...');
-
-                            const responseData = attackerIdMapping.map(row => [...row.responseRow, row.attackerId]);
-                            const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId) VALUES ?';
-
-                            db.query(insertResponseQuery, [responseData], (err, result) => {
-                              if (err) throw err;
-                              console.log('Response data imported...');
-
-                              const incidentData = attackerIdMapping.map(row => [...row.incidentRow, row.attackerId]);
-                              const insertIncidentQuery = 'INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId) VALUES ?';
-
-                              db.query(insertIncidentQuery, [incidentData], (err, result) => {
-                                if (err) throw err;
-                                console.log('Incident data imported...');
-                              });
-                            });
-                          });
-                        });
-                      });
-                    } else {
-                      console.log('No valid data to import.');
-                    }
-                  });
-              };
-
-              importCSV();
-            });
-          });
-        });
+            await db.commit();
+            console.log('CSV data imported...');
+          } catch (err) {
+            await db.rollback();
+            console.error('Error importing CSV data:', err);
+          }
+        } else {
+          console.log('No valid data to import.');
+        }
       });
-    });
-  });
-});
+  } catch (err) {
+    console.error('Error importing CSV:', err);
+  }
+}
+
+async function bulkInsert(table, columns, rows) {
+  const query = `INSERT INTO ${table} (${columns.join(', ')}) VALUES ?`;
+  const [result] = await db.query(query, [rows]);
+  const ids = Array.from({ length: rows.length }, (_, i) => result.insertId + i);
+  return ids;
+}
+
+initializeDatabase();
 
 // Base query for fetching all related data
 const baseQuery = `
@@ -217,16 +171,40 @@ const baseQuery = `
   JOIN attacker a ON v.attackerId = a.id
 `;
 
-
-app.get('/api/incidents', (req, res) => {
-  db.query(baseQuery, (err, results) => {
-    if (err) throw err;
+app.get('/api/incidents', async (req, res) => {
+  try {
+    const [results] = await db.query(baseQuery);
     res.json(results);
-  });
+  } catch (err) {
+    console.error('Error fetching incidents:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Sort feature
-app.get('/api/sort', (req, res) => {
+// Search endpoint
+app.get('/api/search', async (req, res) => {
+  const { keyword } = req.query;
+  if (!keyword) {
+    return res.status(400).json({ error: 'Keyword is required' });
+  }
+
+  try {
+    const searchQuery = `
+      ${baseQuery}
+      WHERE i.AttackType LIKE ? OR i.AttackSignature LIKE ? OR i.Timestamp LIKE ?
+    `;
+    const searchValue = `%${keyword}%`;
+    console.log('Search keyword:', keyword);
+    const [results] = await db.query(searchQuery, [searchValue, searchValue, searchValue]);
+    console.log('Search results:', results);
+    res.json(results);
+  } catch (err) {
+    console.error('Error searching incidents:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/sort', async (req, res) => {
   const { column, order } = req.query;
   const validColumns = ['Timestamp', 'AttackType', 'AttackSignature'];
   const validOrder = ['ASC', 'DESC'];
@@ -235,31 +213,33 @@ app.get('/api/sort', (req, res) => {
     return res.status(400).json({ error: 'Invalid sort parameters' });
   }
 
-  const query = baseQuery + ` ORDER BY ?? ${order}`;
-  db.query(query, [column], (err, results) => {
-    if (err) throw err;
+  try {
+    const query = `${baseQuery} ORDER BY ?? ${order}`;
+    const [results] = await db.query(query, [column]);
     res.json(results);
-  });
+  } catch (err) {
+    console.error('Error sorting incidents:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Incident details page
-app.get('/api/incident/:id', (req, res) => {
+app.get('/api/incident/:id', async (req, res) => {
   const { id } = req.params;
-  const query = baseQuery + ` WHERE i.id = ?`;
-
-  db.query(query, [id], (err, results) => {
-    if (err) throw err;
+  try {
+    const query = `${baseQuery} WHERE i.id = ?`;
+    const [results] = await db.query(query, [id]);
     res.json(results);
-  });
+  } catch (err) {
+    console.error('Error fetching incident:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Analysis feature (placeholder)
 app.get('/api/incident/:id/analysis', (req, res) => {
   res.json({ message: 'Analysis feature coming soon...' });
 });
 
-// Delete feature
-app.delete('/api/delete/:id', (req, res) => {
+app.delete('/api/delete/:id', async (req, res) => {
   const { id } = req.params;
   const deleteQuery = `
     DELETE i, r, n, v, a
@@ -270,15 +250,16 @@ app.delete('/api/delete/:id', (req, res) => {
     JOIN attacker a ON v.attackerId = a.id
     WHERE i.id = ?
   `;
-
-  db.query(deleteQuery, [id], (err, results) => {
-    if (err) throw err;
+  try {
+    await db.query(deleteQuery, [id]);
     res.json({ message: 'Record deleted successfully' });
-  });
+  } catch (err) {
+    console.error('Error deleting record:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Add feature
-app.post('/api/add', (req, res) => {
+app.post('/api/add', async (req, res) => {
   const {
     SourceIP, SourcePort,
     DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation,
@@ -287,68 +268,38 @@ app.post('/api/add', (req, res) => {
     AttackType, Timestamp, AttackSignature
   } = req.body;
 
-  db.beginTransaction((err) => {
-    if (err) throw err;
+  try {
+    await db.beginTransaction();
 
     const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort) VALUES (?, ?)';
-    db.query(insertAttackerQuery, [SourceIP, SourcePort], (err, result) => {
-      if (err) {
-        return db.rollback(() => {
-          throw err;
-        });
-      }
-      const attackerId = result.insertId;
+    const [attackerResult] = await db.query(insertAttackerQuery, [SourceIP, SourcePort]);
+    const attackerId = attackerResult.insertId;
 
-      const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES (?, ?, ?, ?, ?, ?)';
-      db.query(insertVictimQuery, [DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId], (err, result) => {
-        if (err) {
-          return db.rollback(() => {
-            throw err;
-          });
-        }
-        const victimId = result.insertId;
+    const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES (?, ?, ?, ?, ?, ?)';
+    const [victimResult] = await db.query(insertVictimQuery, [DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId]);
+    const victimId = victimResult.insertId;
 
-        const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId) VALUES (?, ?, ?, ?, ?, ?)';
-        db.query(insertNetworkTrafficQuery, [Protocol, PacketLength, PacketType, TrafficType, Segment, victimId], (err, result) => {
-          if (err) {
-            return db.rollback(() => {
-              throw err;
-            });
-          }
-          const networkTrafficId = result.insertId;
+    const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId) VALUES (?, ?, ?, ?, ?, ?)';
+    const [networkTrafficResult] = await db.query(insertNetworkTrafficQuery, [Protocol, PacketLength, PacketType, TrafficType, Segment, victimId]);
+    const networkTrafficId = networkTrafficResult.insertId;
 
-          const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId) VALUES (?, ?, ?, ?, ?)';
-          db.query(insertResponseQuery, [AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId], (err, result) => {
-            if (err) {
-              return db.rollback(() => {
-                throw err;
-              });
-            }
-            const responseId = result.insertId;
+    const insertResponseQuery = 'INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId) VALUES (?, ?, ?, ?, ?)';
+    const [responseResult] = await db.query(insertResponseQuery, [AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId]);
+    const responseId = responseResult.insertId;
 
-            const insertIncidentQuery = 'INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId) VALUES (?, ?, ?, ?)';
-            db.query(insertIncidentQuery, [AttackType, Timestamp, AttackSignature, responseId], (err, result) => {
-              if (err) {
-                return db.rollback(() => {
-                  throw err;
-                });
-              }
+    const insertIncidentQuery = 'INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId) VALUES (?, ?, ?, ?)';
+    await db.query(insertIncidentQuery, [AttackType, Timestamp, AttackSignature, responseId]);
 
-              db.commit((err) => {
-                if (err) {
-                  return db.rollback(() => {
-                    throw err;
-                  });
-                }
-                res.json({ message: 'Record added successfully' });
-              });
-            });
-          });
-        });
-      });
-    });
-  });
+    await db.commit();
+    res.json({ message: 'Record added successfully' });
+  } catch (err) {
+    await db.rollback();
+    console.error('Error adding record:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -21,13 +21,19 @@ function IncidentList({ incidents, onIncidentClick, onSort }) {
         </tr>
       </thead>
       <tbody>
-        {incidents.map(incident => (
-          <tr key={incident.id} onClick={() => onIncidentClick(incident)}>
-            <td>{incident.Timestamp}</td>
-            <td>{incident.AttackType}</td>
-            <td>{incident.AttackSignature}</td>
+        {Array.isArray(incidents) && incidents.length > 0 ? (
+          incidents.map(incident => (
+            <tr key={incident.id} onClick={() => onIncidentClick(incident)}>
+              <td>{incident.Timestamp}</td>
+              <td>{incident.AttackType}</td>
+              <td>{incident.AttackSignature}</td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="3">No incidents found</td>
           </tr>
-        ))}
+        )}
       </tbody>
     </table>
   );

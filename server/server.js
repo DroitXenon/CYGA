@@ -217,27 +217,6 @@ const baseQuery = `
   JOIN attacker a ON v.attackerId = a.id
 `;
 
-// Search feature
-app.get('/api/search', (req, res) => {
-  const { query } = req.query;
-  let searchQuery = baseQuery + ` WHERE 
-    i.AttackType LIKE ? OR 
-    i.AttackSignature LIKE ? OR 
-    r.ActionTaken LIKE ? OR 
-    v.UserInfo LIKE ? OR 
-    v.DeviceInfo LIKE ? OR 
-    a.SourceIP LIKE ? OR 
-    a.SourcePort LIKE ? OR 
-    v.DestinationIP LIKE ? OR 
-    v.DestinationPort LIKE ? OR
-    i.Timestamp LIKE ?`;
-  const params = Array(10).fill(`%${query}%`);
-
-  db.query(searchQuery, params, (err, results) => {
-    if (err) throw err;
-    res.json(results);
-  });
-});
 
 app.get('/api/incidents', (req, res) => {
   db.query(baseQuery, (err, results) => {

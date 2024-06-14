@@ -6,7 +6,6 @@ import IncidentDetails from './components/IncidentDetails';
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidentData, setIncidentData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchIncidents();
@@ -18,7 +17,7 @@ function App() {
       .then(data => setIncidentData(data))
       .catch(error => console.error('Error fetching incident data:', error));
   };
-  
+
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
   };
@@ -27,14 +26,6 @@ function App() {
     setSelectedIncident(null);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchIncidents(searchQuery);
-  };
 
   const handleSort = (column, order) => {
     fetch(`http://localhost:5001/api/sort?column=${column}&order=${order}`)
@@ -55,15 +46,6 @@ function App() {
           <IncidentDetails incident={selectedIncident} />
         ) : (
           <>
-            <form className="search-bar" onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                placeholder="Search incidents..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              <button type="submit">Search</button>
-            </form>
             <IncidentList incidents={incidentData} onIncidentClick={handleIncidentClick} onSort={handleSort} />
           </>
         )}

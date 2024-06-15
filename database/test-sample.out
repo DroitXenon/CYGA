@@ -207,7 +207,7 @@ mysql> SELECT * FROM incident;
 
 
 
-5. Analysis
+-- 5. Analysis
 mysql> SELECT *,
     -> CASE
     ->     WHEN n.PacketLength < 500 THEN 'Low'

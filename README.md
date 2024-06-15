@@ -35,7 +35,7 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 
 - **Analysis** The analytics feature is available to every user who visits our site. This feature allows users to get analysis and recommendations. By clicking on any incident bar, the user will be automatically redirected to a new page showing all the details of the incident. Then click on the "Analyze" button on the bottom of the detail page. 
 
-Following features will be added in later version:\
+Following features will be added in later version:
 
 - **Visualizing** By using Globe.GL and Earth API, quickly pinpoint the geographical origin of an attack.
 
@@ -75,13 +75,7 @@ Database:
     cd CYGA/server
     ```
 
-2. **Install the dependencies:**
-
-    ```bash
-    npm install
-    ```
-
-3. **Update the MySQL connection details in `server.js`:**
+2. **Update the MySQL connection details in `server.js`:**
 
     ```javascript
     const dbConfig = {
@@ -89,6 +83,18 @@ Database:
         user: process.env.DB_USER || 'root', //Change to Your Own User Name
         password: process.env.DB_PASSWORD,  //Change to Your Own Password
     };
+    ```
+
+3. **(Optional) Update the OpenAI API Key in `server.js`:**
+
+    ```javascript
+    openai.apiKey = process.env.OPENAI_API_KEY; //Replace with your own API key
+    ```
+
+4. **Install the dependencies:**
+
+    ```bash
+    npm install
     ```
 
 5. **Start the backend server:**
@@ -103,12 +109,6 @@ Database:
 
     ```bash
     cd CYGA/client
-    ```
-
-2. **(Optional) Update the OpenAI API Key in `server.js`:**
-
-    ```javascript
-    openai.apiKey = process.env.OPENAI_API_KEY; //Replace with your own API key
     ```
 
 2. **Install the dependencies:**

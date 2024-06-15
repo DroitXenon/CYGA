@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import IncidentList from './components/IncidentList';
 import IncidentDetails from './components/IncidentDetails';
 import './App.css';
+import Globe from 'globe.gl';
 
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidentData, setIncidentData] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [newIncident, setNewIncident] = useState({
     SourceIP: '',
     SourcePort: '',
@@ -33,7 +37,19 @@ function App() {
   });
   const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
 
+  const globeEl = useRef();
+
   useEffect(() => {
+    const globe = Globe()
+      (globeEl.current)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+      .pointsData([{ lat: 37.7749, lng: -122.4194, size: 10, color: 'red' }, { lat: 40.7128, lng: -74.0060, size: 10, color: 'blue' }])
+      .pointAltitude('size')
+      .pointColor('color');
+
+    globe.pointOfView({ altitude: 2.5 });
     fetchIncidents();
   }, []);
 
@@ -100,6 +116,10 @@ function App() {
     setNewIncident({ ...newIncident, [name]: value });
   };
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <Container>
       <AppBar position="absolute">
@@ -115,22 +135,32 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Box sx={{ mt: 12 }}>
-        {selectedIncident ? (
-          <IncidentDetails incident={selectedIncident} />
-        ) : (
-          <IncidentList 
-            incidents={incidentData} 
-            onIncidentClick={handleIncidentClick} 
-            onSort={handleSort} 
-            onSelectIncident={handleSelectIncident} 
-            selectedIncidentIds={selectedIncidentIds} 
-            fetchIncidents={fetchIncidents}
-            setIncidentData={setIncidentData}
-            handleAddIncident={() => setIsAddModalOpen(true)}
-            handleDeleteIncidents={handleDeleteIncidents}
-          />
-        )}
+      <Box sx={{ mt: 12, display: 'flex' }}>
+        <Box sx={{ width: isExpanded ? '80%' : '30%', transition: 'width 0.3s' }}>
+          {selectedIncident ? (
+            <IncidentDetails incident={selectedIncident} />
+          ) : (
+            <IncidentList 
+              incidents={incidentData} 
+              onIncidentClick={handleIncidentClick} 
+              onSort={handleSort} 
+              onSelectIncident={handleSelectIncident} 
+              selectedIncidentIds={selectedIncidentIds} 
+              fetchIncidents={fetchIncidents}
+              setIncidentData={setIncidentData}
+              handleAddIncident={() => setIsAddModalOpen(true)}
+              handleDeleteIncidents={handleDeleteIncidents}
+            />
+          )}
+        </Box>
+        <Box sx={{ width: isExpanded ? '20%' : '70%', transition: 'width 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <IconButton onClick={toggleExpand}>
+            {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Box>
+        <Box sx={{ width: '70%', height: '100vh' }}>
+          <div ref={globeEl} style={{ width: '100%', height: '100%' }}></div>
+        </Box>
       </Box>
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <Box

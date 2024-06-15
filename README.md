@@ -25,30 +25,33 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 
 ## Features
 
-- **Search:** Enables users to quickly locate specific data in a cybersecurity database using queries like IP addresses, attack types, and incident IDs; results are displayed in an easily navigable table.
+- **Search:** The search feature is intended to help users, such as IT professionals and security analysts, easily find specific data within the cybersecurity database.
 
-- **Filter:** Allows users to refine search results by severity and attack type directly from the interface, providing quick access to relevant information for effective trend analysis and incident management.
+- **Add:** The add feature aims to improve user participation by allowing users to add new data entries to the cybersecurity database.The "Add" button, located conveniently at the bottom of the user interface, will open a modal in which users can enter critical information such as the timestamp, source IP address, protocol, and user information. 
 
-- **Select:** Allows users get AI-driven analysis and recommendations. Users check the boxes next to data entries and click the "Analysis" button. to receive AI-generated insights based on their selections. This makes data analysis easy and accessible.
+- **Sort:** The sort feature allows users to organize data efficiently. By clicking the arrow next to every entity, users can sort the data in lexicographic order based on that entity.
 
-- **Sort:** The Sort feature allows users to organize data. By clicking the arrow next to any entity, users can sort the data alphabetically. This helps users quickly find and analyze information.
+- **Delete** The delete feature allows users to manage and remove existing data entries, keeping the cybersecurity database relevant and up to date. Users can select one or more entries using the checkboxes next to each data row, providing flexibility for managing bulk or individual records. 
 
-    _Following features will be added in later version:_
+- **Analysis** The analytics feature is available to every user who visits our site. This feature allows users to get analysis and recommendations. By clicking on any incident bar, the user will be automatically redirected to a new page showing all the details of the incident. Then click on the "Analyze" button on the bottom of the detail page. 
+
+Following features will be added in later version:\
+
+- **Visualizing** By using Globe.GL and Earth API, quickly pinpoint the geographical origin of an attack.
+
 - **Timestamping:** Every event is recorded with a precise timestamp, ensuring that you can track the sequence of events down to the millisecond.
-
-- **Location Finding:** Quickly pinpoint the geographical origin of an attack with our advanced geolocation algorithms.
-
-- **Attack Type Identification:** Our system classifies the nature of the attack, providing you with immediate insight into the potential threat.
-
-- **Attack Analysis:** In-depth analysis of each attack helps you understand the attacker's methods and motives.
 
 - **Data Statistics:** Comprehensive statistics offer a macro and micro view of the cyber threat landscape, aiding in strategic decision-making.
 
 ## Demo
-
 Website:
+[Main Page]
 <div align="center">
-<img src="shared/constants/demo.png"/>
+<img src="shared/constants/demomainpage.png"/>
+</div>
+[Detail Page]
+<div align="center">
+<img src="shared/constants/demodetailpage.png"/>
 </div>
 Database:
 <div align="center">

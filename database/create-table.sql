@@ -1,3 +1,5 @@
+-- File for C2
+
 CREATE DATABASE IF NOT EXISTS test;
 USE test;
 

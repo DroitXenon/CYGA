@@ -1,44 +1,228 @@
+-- File for C3 (Output Part)
+
+-- Show all the data (Not a feature)
 mysql> SELECT * FROM attacker;
-+----+---------------+------------+
-| id | SourceIP      | SourcePort |
-+----+---------------+------------+
-|  1 | 103.216.15.12 |      31225 |
-|  2 | 192.168.0.1   |       5001 |
-+----+---------------+------------+
-2 rows in set (0.00 sec)
++----+-------------+------------+
+| id | SourceIP    | SourcePort |
++----+-------------+------------+
+|  1 | 192.168.0.1 |       5001 |
++----+-------------+------------+
+1 row in set (0.00 sec)
 
 mysql> SELECT * FROM victim;
-+----+---------------+-----------------+---------------+-----------------------------------------------------------------+--------------------+------------+
-| id | DestinationIP | DestinationPort | UserInfo      | DeviceInfo                                                      | GeoLocation        | attackerId |
-+----+---------------+-----------------+---------------+-----------------------------------------------------------------+--------------------+------------+
-|  1 | 84.9.164.252  |           17616 | Reyansh Dugal | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Jamshedpur, Sikkim |          1 |
-|  2 | 84.9.164.252  |           17616 | Justin Wang   | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada   |          1 |
-+----+---------------+-----------------+---------------+-----------------------------------------------------------------+--------------------+------------+
-2 rows in set (0.00 sec)
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+| id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+|  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+1 row in set (0.00 sec)
 
 mysql> SELECT * FROM network_traffic;
 +----+----------+--------------+------------+-------------+-----------+----------+
 | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
 +----+----------+--------------+------------+-------------+-----------+----------+
 |  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |
-|  2 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |
 +----+----------+--------------+------------+-------------+-----------+----------+
-2 rows in set (0.00 sec)
+1 row in set (0.00 sec)
 
 mysql> SELECT * FROM response;
 +----+---------------+-------------+---------------+-----------+------------------+
 | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId |
 +----+---------------+-------------+---------------+-----------+------------------+
-|  1 | 28.67         | Logged      | Low           | Server    |                1 |
-|  2 | 60            | Logged      | Low           | Server    |                1 |
+|  1 | 60            | Logged      | Low           | Server    |                1 |
 +----+---------------+-------------+---------------+-----------+------------------+
-2 rows in set (0.00 sec)
+1 row in set (0.00 sec)
 
 mysql> SELECT * FROM incident;
 +----+------------+---------------------+-----------------+------------+
 | id | AttackType | Timestamp           | AttackSignature | responseId |
 +----+------------+---------------------+-----------------+------------+
-|  1 | Malware    | 2023-05-30 06:33:58 | Known Pattern B |          1 |
-|  2 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |
++----+------------+---------------------+-----------------+------------+
+1 row in set (0.00 sec)
+
+There are five features:
+-- 1.Search 
+
+mysql> SELECT *
+    -> FROM incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id
+    -> WHERE i.AttackType LIKE '%Malware%'
+    ->     OR i.AttackSignature LIKE '%Known Pattern B%'
+    ->     OR i.Timestamp LIKE '2024-06-01 06:33:58';
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId | id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId | id | SourceIP    | SourcePort |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |  1 | 60            | Logged      | Low           | Server    |                1 |  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |  1 | 192.168.0.1 |       5001 |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+1 row in set (0.00 sec)
+
+
+
+
+-- 2.Add
+
+mysql> INSERT INTO attacker (SourceIP, SourcePort)
+    ->     VALUES ('192.168.0.2', 5000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM attacker;
++----+-------------+------------+
+| id | SourceIP    | SourcePort |
++----+-------------+------------+
+|  1 | 192.168.0.1 |       5001 |
+|  2 | 192.168.0.2 |       5000 |
++----+-------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId)
+    ->     VALUES ('15.9.371.480', 85265, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM victim;
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+| id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+|  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |
+|  2 | 15.9.371.480  |           85265 | Talia Zhang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          2 |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
+    ->     VALUES ('ICMP', 4040, 'Data', 'HTTP', 'Segment B','2');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM network_traffic;
++----+----------+--------------+------------+-------------+-----------+----------+
+| id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
++----+----------+--------------+------------+-------------+-----------+----------+
+|  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |
+|  2 | ICMP     |         4040 | Data       | HTTP        | Segment B |        2 |
++----+----------+--------------+------------+-------------+-----------+----------+
+2 rows in set (0.00 sec)
+
+mysql> INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
+    ->     VALUES ('60', 'Logged', 'High', 'Server', 2);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM response;
++----+---------------+-------------+---------------+-----------+------------------+
+| id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId |
++----+---------------+-------------+---------------+-----------+------------------+
+|  1 | 60            | Logged      | Low           | Server    |                1 |
+|  2 | 60            | Logged      | High          | Server    |                2 |
++----+---------------+-------------+---------------+-----------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId)
+    ->     VALUES ('Malware', '2024-06-02 03:55:01', 'Known Pattern A', 2);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM incident;
++----+------------+---------------------+-----------------+------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId |
++----+------------+---------------------+-----------------+------------+
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |
+|  2 | Malware    | 2024-06-02 03:55:01 | Known Pattern A |          2 |
 +----+------------+---------------------+-----------------+------------+
 2 rows in set (0.00 sec)
+
+
+
+
+-- 3. Sort
+
+mysql> SELECT *
+    -> FROM incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id
+    -> ORDER BY i.Timestamp ASC;
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId | id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId | id | SourceIP    | SourcePort |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |  1 | 60            | Logged      | Low           | Server    |                1 |  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |  1 | 192.168.0.1 |       5001 |
+|  2 | Malware    | 2024-06-02 03:55:01 | Known Pattern A |          2 |  2 | 60            | Logged      | High          | Server    |                2 |  2 | ICMP     |         4040 | Data       | HTTP        | Segment B |        2 |  2 | 15.9.371.480  |           85265 | Talia Zhang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          2 |  2 | 192.168.0.2 |       5000 |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+
+2 rows in set (0.00 sec)
+
+
+
+
+-- 4. Delete
+
+mysql> DELETE i, r, n, v, a
+    -> FROM incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id
+    -> WHERE i.id = 2;
+Query OK, 5 rows affected (0.01 sec)
+
+mysql> SELECT * FROM attacker;
++----+-------------+------------+
+| id | SourceIP    | SourcePort |
++----+-------------+------------+
+|  1 | 192.168.0.1 |       5001 |
++----+-------------+------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM victim;
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+| id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+|  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |
++----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM network_traffic;
++----+----------+--------------+------------+-------------+-----------+----------+
+| id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
++----+----------+--------------+------------+-------------+-----------+----------+
+|  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |
++----+----------+--------------+------------+-------------+-----------+----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM response;
++----+---------------+-------------+---------------+-----------+------------------+
+| id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId |
++----+---------------+-------------+---------------+-----------+------------------+
+|  1 | 60            | Logged      | Low           | Server    |                1 |
++----+---------------+-------------+---------------+-----------+------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM incident;
++----+------------+---------------------+-----------------+------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId |
++----+------------+---------------------+-----------------+------------+
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |
++----+------------+---------------------+-----------------+------------+
+1 row in set (0.01 sec)
+
+
+
+
+5. Analysis
+mysql> SELECT *,
+    -> CASE
+    ->     WHEN n.PacketLength < 500 THEN 'Low'
+    ->     WHEN n.PacketLength BETWEEN 500 AND 1000 THEN 'Medium'
+    ->     ELSE 'High'
+    -> END AS ReportLevel
+    -> FROM incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id
+    -> WHERE i.id = 1;
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+-------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId | id | DestinationIP | DestinationPort | UserInfo    | DeviceInfo                                                      | GeoLocation      | attackerId | id | SourceIP    | SourcePort | ReportLevel |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+-------------+
+|  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |  1 | 60            | Logged      | Low           | Server    |                1 |  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |  1 | 192.168.0.1 |       5001 | Medium      |
++----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+-------------+
+1 row in set (0.00 sec)

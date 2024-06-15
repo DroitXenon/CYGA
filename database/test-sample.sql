@@ -1,3 +1,5 @@
+-- File for C3 (Impl Part)
+
 -- First need to have a valid dataset (example)
 INSERT INTO attacker (SourceIP, SourcePort) VALUES ('192.168.0.1', 5001);
 
@@ -33,7 +35,20 @@ WHERE i.AttackType LIKE '%Malware%'
     OR i.Timestamp LIKE '2024-06-01 06:33:58';
     -- (Here '' is a place holder, user can change to other words to search)
 
--- 2.Sort 
+-- 2.Add
+INSERT INTO attacker (SourceIP, SourcePort) 
+    VALUES ('192.168.0.2', 5000);
+INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId)
+    VALUES ('15.9.371.480', 85265, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
+INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
+    VALUES ('ICMP', 4040, 'Data', 'HTTP', 'Segment B','2');
+INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
+    VALUES ('60', 'Logged', 'High', 'Server', 2);
+INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId)
+    VALUES ('Malware', '2024-06-02 03:55:01', 'Known Pattern A', 2);
+    -- (Can change whatever user want in VALUES(?,?))
+
+-- 3.Sort 
 SELECT *
 FROM incident i
 JOIN response r ON i.responseId = r.id
@@ -43,18 +58,6 @@ JOIN attacker a ON v.attackerId = a.id
 ORDER BY i.Timestamp ASC; 
     -- (Can change the atrribute and order user want to re-order)
 
--- 3.Add
-INSERT INTO attacker (SourceIP, SourcePort) 
-    VALUES ('192.168.0.2', 5000);
-INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId)
-    VALUES ('15.9.371.480', 85265, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
-INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
-    VALUES ('ICMP', 4040, 'Data', 'HTTP', 'Segment B', 2);
-INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
-    VALUES ('60', 'Logged', 'High', 'Server', 2);
-INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId)
-    VALUES ('Malware', '2024-06-02 03:55:01', 'Known Pattern A', 2);
-    -- (Can change whatever user want in VALUES(?,?))
 
 -- 4. Delete
 DELETE i, r, n, v, a
@@ -78,6 +81,6 @@ JOIN response r ON i.responseId = r.id
 JOIN network_traffic n ON r.networkTrafficId = n.id
 JOIN victim v ON n.victimId = v.id
 JOIN attacker a ON v.attackerId = a.id
-WHERE i.id = 2;
+WHERE i.id = 1;
     --(Can change 2 to the IID user want)
 

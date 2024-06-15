@@ -21,6 +21,7 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 <div align="center">
 <img src="shared/constants/erdiagram.jpeg"/>
 <img src="shared/constants/scheme.jpeg"/>
+<img src="shared/constants/Normalization.jpeg"/>
 </div>
 
 ## Features
@@ -99,13 +100,13 @@ Database:
 
 ### Frontend Setup
 
-1. **Navigate to the frontend directory:**
+1. **Keep the backend terminal alive, create a new terminal and navigate to the frontend directory:**
 
     ```bash
-    cd ../client
+    cd CYGA/client
     ```
 
-2. **Update the OpenAI API Key in `server.js`:**
+2. **(Optional) Update the OpenAI API Key in `server.js`:**
 
     ```javascript
     openai.apiKey = process.env.OPENAI_API_KEY; //Replace with your own API key
@@ -120,7 +121,7 @@ Database:
 2. **Install the Material-UI Interface:**
 
     ```bash
-    npm install @mui/material @mui/styled-engine @emotion/react @emotion/styled
+    npm install @mui/material @mui/styled-engine @emotion/react @emotion/styled @mui/icons-material
     ```
 
 3. **Start the React application:**

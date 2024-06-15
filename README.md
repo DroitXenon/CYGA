@@ -118,12 +118,6 @@ Database:
     npm install
     ```
 
-2. **Install the Material-UI Interface:**
-
-    ```bash
-    npm install @mui/material @mui/styled-engine @emotion/react @emotion/styled @mui/icons-material
-    ```
-
 3. **Start the React application:**
 
     ```bash

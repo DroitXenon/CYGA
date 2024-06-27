@@ -37,13 +37,13 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
           onChange={(e) => setSearchKeyword(e.target.value)}
           sx={{ mr: 2 }}
         />
-        <Button variant="contained" onClick={handleSearch}>
+        <Button variant="contained" onClick={handleSearch} style={{ width: '70px', height: '50px' }}>
           Search
         </Button>
-        <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ ml: 2 }}>
+        <Button variant="contained" onClick={handleAddIncident} style={{ width: '70px', height: '50px'}} sx={{ ml: 2 }}>
           Add
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
+        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} style={{ width: '70px', height: '50px'}} sx={{ ml: 2 }}>
           Delete
         </Button>
       </Box>

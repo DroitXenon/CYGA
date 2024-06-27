@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import HomeIcon from '@mui/icons-material/Home';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IncidentList from './components/IncidentList';
 import IncidentDetails from './components/IncidentDetails';
 import './App.css';
@@ -120,11 +118,11 @@ function App() {
     <div className="App">
       <AppBar position="absolute">
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+          <IconButton edge="start" color="inherit" aria-label="menu">
             <MenuIcon />
           </IconButton>
           <IconButton color="inherit" onClick={handleBackClick} sx= {{ mr: 2 }}>
-            <HomeIcon />
+            <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6" >
             CYGA Dashboard
@@ -135,7 +133,7 @@ function App() {
       <div style={{ position: 'relative', height: '100vh', marginTop: '64px' }}>
         <div ref={globeEl} style={{ position: 'relative', left: 250, width: '100%', height: '100%' }}></div>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', backgroundColor: 'white', borderRight: '3px solid #ccc', padding: '25px' }}>
-          <Box>
+          <Box className="table-container">
             {selectedIncident ? (
               <IncidentDetails incident={selectedIncident} />
             ) : (

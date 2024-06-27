@@ -42,13 +42,9 @@ function App() {
   useEffect(() => {
     const globe = Globe()
       (globeEl.current)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-      .pointsData([{ lat: 37.7749, lng: -122.4194, size: 10, color: 'red' }, { lat: 40.7128, lng: -74.0060, size: 10, color: 'blue' }])
-      .pointAltitude('size')
-      .pointColor('color');
-
+      .backgroundColor('#ffffff')
     globe.pointOfView({ altitude: 2.5 });
     fetchIncidents();
   }, []);
@@ -121,47 +117,45 @@ function App() {
   };
 
   return (
-    <Container>
+    <div className="App">
       <AppBar position="absolute">
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Dashboard
-          </Typography>
-          <IconButton color="inherit" onClick={handleBackClick}>
+          <IconButton color="inherit" onClick={handleBackClick} sx= {{ mr: 2 }}>
             <HomeIcon />
           </IconButton>
+          <Typography variant="h6" >
+            CYGA Dashboard
+          </Typography>
         </Toolbar>
       </AppBar>
-      <Box sx={{ mt: 12, display: 'flex' }}>
-        <Box sx={{ width: isExpanded ? '80%' : '30%', transition: 'width 0.3s' }}>
-          {selectedIncident ? (
-            <IncidentDetails incident={selectedIncident} />
-          ) : (
-            <IncidentList 
-              incidents={incidentData} 
-              onIncidentClick={handleIncidentClick} 
-              onSort={handleSort} 
-              onSelectIncident={handleSelectIncident} 
-              selectedIncidentIds={selectedIncidentIds} 
-              fetchIncidents={fetchIncidents}
-              setIncidentData={setIncidentData}
-              handleAddIncident={() => setIsAddModalOpen(true)}
-              handleDeleteIncidents={handleDeleteIncidents}
-            />
-          )}
-        </Box>
-        <Box sx={{ width: isExpanded ? '20%' : '70%', transition: 'width 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconButton onClick={toggleExpand}>
-            {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        </Box>
-        <Box sx={{ width: '70%', height: '100vh' }}>
-          <div ref={globeEl} style={{ width: '100%', height: '100%' }}></div>
-        </Box>
-      </Box>
+
+      <div style={{ position: 'relative', height: '100vh', marginTop: '64px' }}>
+        <div ref={globeEl} style={{ position: 'relative', left: 250, width: '100%', height: '100%' }}></div>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', backgroundColor: 'white', borderRight: '3px solid #ccc', padding: '25px' }}>
+          <Box>
+            {selectedIncident ? (
+              <IncidentDetails incident={selectedIncident} />
+            ) : (
+              <IncidentList 
+                incidents={incidentData} 
+                onIncidentClick={handleIncidentClick} 
+                onSort={handleSort} 
+                onSelectIncident={handleSelectIncident} 
+                selectedIncidentIds={selectedIncidentIds} 
+                fetchIncidents={fetchIncidents}
+                setIncidentData={setIncidentData}
+                handleAddIncident={() => setIsAddModalOpen(true)}
+                handleDeleteIncidents={handleDeleteIncidents}
+              />
+            )}
+          </Box>
+        </div>
+      </div>
+
+
       <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <Box
           sx={{
@@ -195,7 +189,8 @@ function App() {
           </Button>
         </Box>
       </Modal>
-    </Container>
+
+    </div>
   );
 }
 

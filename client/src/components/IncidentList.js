@@ -26,7 +26,6 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
     }
   };
 
-
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>

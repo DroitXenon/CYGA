@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IncidentList from './components/IncidentList';
@@ -15,8 +15,12 @@ function App() {
   const [newIncident, setNewIncident] = useState({
     SourceIP: '',
     SourcePort: '',
+    SourceLatitude: '',
+    SourceLongitude: '',
     DestinationIP: '',
     DestinationPort: '',
+    DestinationLatitude: '',
+    DestinationLongitude: '',
     UserInfo: '',
     DeviceInfo: '',
     GeoLocation: '',

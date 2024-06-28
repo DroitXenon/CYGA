@@ -37,12 +37,16 @@ async function initializeDatabase() {
       `CREATE TABLE IF NOT EXISTS attacker (
         id INT AUTO_INCREMENT PRIMARY KEY,
         SourceIP VARCHAR(255),
-        SourcePort INT
+        SourcePort INT,
+        SourceLatitude VARCHAR(255),
+        SourceLongitude VARCHAR(255)
       );`,
       `CREATE TABLE IF NOT EXISTS victim (
         id INT AUTO_INCREMENT PRIMARY KEY,
         DestinationIP VARCHAR(255),
         DestinationPort INT,
+        DestinationLatitude VARCHAR(255),
+        DestinationLongitude VARCHAR(255),
         UserInfo VARCHAR(255),
         DeviceInfo VARCHAR(255),
         GeoLocation VARCHAR(255),
@@ -91,22 +95,29 @@ async function initializeDatabase() {
 
 async function importCSV() {
   try {
-    const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
+    const filePath = path.join(__dirname, '../shared/constants/updated_sample_data.csv');
     const csvData = [];
 
     fs.createReadStream(filePath)
       .pipe(csv())
       .on('data', (row) => {
-        const attackerRow = [row['Source IP Address'], row['Source Port']];
+        const attackerRow = [
+          row['Source IP Address'], 
+          row['Source Port'],
+          row['Source Latitude'],
+          row['Source Longitude']
+        ];
         const victimRow = [
           row['Destination IP Address'],
           row['Destination Port'],
+          row['Destination Latitude'],
+          row['Destination Longitude'],
           row['User Information'],
           row['Device Information'],
           row['Geo-location Data']
         ];
         const networkTrafficRow = [
-          row.Protocol,
+          row['Protocol'],
           row['Packet Length'],
           row['Packet Type'],
           row['Traffic Type'],
@@ -120,7 +131,7 @@ async function importCSV() {
         ];
         const incidentRow = [
           row['Attack Type'],
-          row.Timestamp,
+          row['Timestamp'],
           row['Attack Signature']
         ];
         csvData.push({ attackerRow, victimRow, networkTrafficRow, responseRow, incidentRow });
@@ -131,8 +142,8 @@ async function importCSV() {
           try {
             await db.beginTransaction();
 
-            const attackerIds = await bulkInsert('attacker', ['SourceIP', 'SourcePort'], csvData.map(row => row.attackerRow));
-            const victimIds = await bulkInsert('victim', ['DestinationIP', 'DestinationPort', 'UserInfo', 'DeviceInfo', 'GeoLocation', 'attackerId'], csvData.map((row, index) => [...row.victimRow, attackerIds[index]]));
+            const attackerIds = await bulkInsert('attacker', ['SourceIP', 'SourcePort', 'SourceLatitude', 'SourceLongitude'], csvData.map(row => row.attackerRow));
+            const victimIds = await bulkInsert('victim', ['DestinationIP', 'DestinationPort', 'DestinationLatitude', 'DestinationLongitude', 'UserInfo', 'DeviceInfo', 'GeoLocation', 'attackerId'], csvData.map((row, index) => [...row.victimRow, attackerIds[index]]));
             const networkTrafficIds = await bulkInsert('network_traffic', ['Protocol', 'PacketLength', 'PacketType', 'TrafficType', 'Segment', 'victimId'], csvData.map((row, index) => [...row.networkTrafficRow, victimIds[index]]));
             const responseIds = await bulkInsert('response', ['AnomalyScores', 'ActionTaken', 'SeverityLevel', 'LogSource', 'networkTrafficId'], csvData.map((row, index) => [...row.responseRow, networkTrafficIds[index]]));
             await bulkInsert('incident', ['AttackType', 'Timestamp', 'AttackSignature', 'responseId'], csvData.map((row, index) => [...row.incidentRow, responseIds[index]]));
@@ -310,8 +321,8 @@ app.delete('/api/delete/:id', async (req, res) => {
 
 app.post('/api/add', async (req, res) => {
   const {
-    SourceIP, SourcePort,
-    DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation,
+    SourceIP, SourcePort, SourceLatitude, SourceLongitude,
+    DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation,
     Protocol, PacketLength, PacketType, TrafficType, Segment,
     AnomalyScores, ActionTaken, SeverityLevel, LogSource,
     AttackType, Timestamp, AttackSignature
@@ -320,12 +331,12 @@ app.post('/api/add', async (req, res) => {
   try {
     await db.beginTransaction();
 
-    const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort) VALUES (?, ?)';
-    const [attackerResult] = await db.query(insertAttackerQuery, [SourceIP, SourcePort]);
+    const insertAttackerQuery = 'INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude) VALUES (?, ?, ?, ?)';
+    const [attackerResult] = await db.query(insertAttackerQuery, [SourceIP, SourcePort, SourceLatitude, SourceLongitude]);
     const attackerId = attackerResult.insertId;
 
-    const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES (?, ?, ?, ?, ?, ?)';
-    const [victimResult] = await db.query(insertVictimQuery, [DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId]);
+    const insertVictimQuery = 'INSERT INTO victim (DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    const [victimResult] = await db.query(insertVictimQuery, [DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId]);
     const victimId = victimResult.insertId;
 
     const insertNetworkTrafficQuery = 'INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId) VALUES (?, ?, ?, ?, ?, ?)';

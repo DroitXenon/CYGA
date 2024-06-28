@@ -28,11 +28,15 @@ function IncidentDetails({ incident }) {
           <Typography variant="h6">Attacker</Typography>
           <Typography>Source IP: {incident.SourceIP}</Typography>
           <Typography>Source Port: {incident.SourcePort}</Typography>
+          <Typography>Source Latitude: {incident.SourceLatitude}</Typography>
+          <Typography>Source Longitude: {incident.SourceLongitude} </Typography>
         </Box>
         <Box mt={2}>
           <Typography variant="h6">Victim</Typography>
           <Typography>Target IP: {incident.DestinationIP}</Typography>
           <Typography>Target Port: {incident.DestinationPort}</Typography>
+          <Typography>Target Latitude: {incident.DestinationLatitude}</Typography>
+          <Typography>Target Longitude: {incident.DestinationLongitude} </Typography>
           <Typography>User Information: {incident.UserInfo}</Typography>
           <Typography>Geolocation: {incident.GeoLocation}</Typography>
         </Box>

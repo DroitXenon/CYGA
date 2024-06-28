@@ -37,25 +37,23 @@ function App() {
     AttackSignature: ''
   });
   const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
-  const [arcsData, setArcsData] = useState([]);
 
   const globeEl = useRef();
+  const globeInstance = useRef(null);
 
   useEffect(() => {
-    const globe = Globe()
+    globeInstance.current = Globe()
       (globeEl.current)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('#ffffff')
-      .arcsData(arcsData)
-      .arcColor(() => 'rgba(255, 0, 0, 0.7)')
-      .arcDashLength(0.4)
-      .arcDashGap(0.2)
-      .arcDashInitialGap(() => Math.random())
-      .arcDashAnimateTime(1500);
-    globe.pointOfView({ altitude: 2.5 });
+      .backgroundColor('#ffffff');
+    globeInstance.current.pointOfView({
+      lat: parseFloat(43.466667),
+      lng: parseFloat(-80.516670),
+      altitude: 3
+    }, 1500);
     fetchIncidents();
-  }, [arcsData]);
+  }, []);
 
   const fetchIncidents = () => {
     fetch(`http://localhost:5001/api/incidents`)
@@ -66,18 +64,42 @@ function App() {
 
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
-    setArcsData([{
-      startLat: parseFloat(incident.SourceLatitude),
-      startLng: parseFloat(incident.SourceLongitude),
-      endLat: parseFloat(incident.DestinationLatitude),
-      endLng: parseFloat(incident.DestinationLongitude),
-      color: ['rgba(0, 255, 0, 0.7)', 'rgba(255, 0, 0, 0.7)']
-    }]);
+
+    const { SourceLatitude, SourceLongitude, DestinationLatitude, DestinationLongitude } = incident;
+
+    const arcsData = [
+      {
+        startLat: parseFloat(SourceLatitude),
+        startLng: parseFloat(SourceLongitude),
+        endLat: parseFloat(DestinationLatitude),
+        endLng: parseFloat(DestinationLongitude),
+      }
+    ];
+
+    globeInstance.current
+      .arcsData(arcsData)
+      .arcColor(() => ['#0252FB', '#C0D3FA'])
+      .arcDashLength(0.5)
+      .arcDashGap(0.5)
+      .arcDashInitialGap(() => Math.random())
+      .arcStroke(() => 0.7)
+      .arcDashAnimateTime(1500);
+
+    globeInstance.current.pointOfView({
+      lat: parseFloat(DestinationLatitude),
+      lng: parseFloat(DestinationLongitude),
+      altitude: 2
+    }, 2000);
   };
 
   const handleBackClick = () => {
     setSelectedIncident(null);
-    setArcsData([]);
+    globeInstance.current.arcsData([]);
+    globeInstance.current.pointOfView({
+      lat: parseFloat(43.466667),
+      lng: parseFloat(-80.516670),
+      altitude: 3
+    }, 2000);
   };
 
   const handleSort = (column, order) => {

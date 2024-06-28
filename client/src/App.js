@@ -59,14 +59,12 @@ function App() {
     fetch(`http://localhost:5001/api/incidents`)
       .then(response => response.json())
       .then(data => setIncidentData(Array.isArray(data) ? data : []))
-      .catch(error => console.error('Error fetching incident data:', error));
+      //.catch(error => console.error('Error fetching incident data:', error));
   };
 
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
-
     const { SourceLatitude, SourceLongitude, DestinationLatitude, DestinationLongitude } = incident;
-
     const arcsData = [
       {
         startLat: parseFloat(SourceLatitude),
@@ -75,7 +73,6 @@ function App() {
         endLng: parseFloat(DestinationLongitude),
       }
     ];
-
     globeInstance.current
       .arcsData(arcsData)
       .arcColor(() => ['#0252FB', '#C0D3FA'])
@@ -84,7 +81,6 @@ function App() {
       .arcDashInitialGap(() => Math.random())
       .arcStroke(() => 0.7)
       .arcDashAnimateTime(1500);
-
     globeInstance.current.pointOfView({
       lat: parseFloat(DestinationLatitude),
       lng: parseFloat(DestinationLongitude),

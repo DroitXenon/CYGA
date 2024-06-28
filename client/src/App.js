@@ -148,7 +148,7 @@ function App() {
 
   return (
     <div className="App">
-      <AppBar position="absolute">
+      <AppBar position="sticky" >
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu">
             <MenuIcon />
@@ -156,14 +156,14 @@ function App() {
           <IconButton color="inherit" onClick={handleBackClick} sx= {{ mr: 2 }}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6" >
-            CYGA Dashboard
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          CYGA Dashboard
           </Typography>
         </Toolbar>
       </AppBar>
 
-      <div style={{ position: 'relative', height: '100vh', marginTop: '64px' }}>
-        <div ref={globeEl} style={{ position: 'relative', left: 250, width: '100%', height: '100%' }}></div>
+      <div style={{ position: 'relative' }}>
+        <div ref={globeEl} style={{ position: 'relative', left: 250}}></div>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', backgroundColor: 'white', borderRight: '3px solid #ccc', padding: '25px' }}>
           <Box className="table-container">
             {selectedIncident ? (

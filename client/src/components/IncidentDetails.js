@@ -6,7 +6,7 @@ function IncidentDetails({ incident }) {
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
 
   const handleAnalyze = () => {
-    fetch(`http://localhost:5001/api/incident/${incident.id}/analysis`)
+    fetch(`http://localhost:5001/api/analysis/${incident.id}`)
       .then(response => response.json())
       .then(data => {
         setAnalysisReport(data);

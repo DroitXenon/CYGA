@@ -11,7 +11,6 @@ function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [incidentData, setIncidentData] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [newIncident, setNewIncident] = useState({
     SourceIP: '',
     SourcePort: '',
@@ -38,6 +37,7 @@ function App() {
     AttackSignature: ''
   });
   const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
+  const [arcsData, setArcsData] = useState([]);
 
   const globeEl = useRef();
 
@@ -47,9 +47,15 @@ function App() {
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('#ffffff')
+      .arcsData(arcsData)
+      .arcColor(() => 'rgba(255, 0, 0, 0.7)')
+      .arcDashLength(0.4)
+      .arcDashGap(0.2)
+      .arcDashInitialGap(() => Math.random())
+      .arcDashAnimateTime(1500);
     globe.pointOfView({ altitude: 2.5 });
     fetchIncidents();
-  }, []);
+  }, [arcsData]);
 
   const fetchIncidents = () => {
     fetch(`http://localhost:5001/api/incidents`)
@@ -60,10 +66,18 @@ function App() {
 
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
+    setArcsData([{
+      startLat: parseFloat(incident.SourceLatitude),
+      startLng: parseFloat(incident.SourceLongitude),
+      endLat: parseFloat(incident.DestinationLatitude),
+      endLng: parseFloat(incident.DestinationLongitude),
+      color: ['rgba(0, 255, 0, 0.7)', 'rgba(255, 0, 0, 0.7)']
+    }]);
   };
 
   const handleBackClick = () => {
     setSelectedIncident(null);
+    setArcsData([]);
   };
 
   const handleSort = (column, order) => {
@@ -112,10 +126,6 @@ function App() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewIncident({ ...newIncident, [name]: value });
-  };
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
   };
 
   return (

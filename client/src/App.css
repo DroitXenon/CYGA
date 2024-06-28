@@ -14,7 +14,7 @@ body {
 }
 
 .table-container {
-  height: calc(100vh - 64px);
+  height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
@@ -25,13 +25,10 @@ body {
 }
 
 .incident-details div {
-  width: 45%;
-  padding: 20px;
+  width: 80%;
+  padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 20px;
 }
 
-.incident-details div h3 {
-  margin-top: 0;
-}

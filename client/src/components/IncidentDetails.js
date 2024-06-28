@@ -22,16 +22,19 @@ function IncidentDetails({ incident }) {
 
   return (
     <Box sx={{ textAlign: 'center', mt: 2 }}>
-      <Typography variant="h4">Details</Typography>
-      <Box className="incident-details" sx={{ textAlign: 'left', mt: 2 }}>
-        <Box mt={2}>
+      <Button variant="contained" color="primary" onClick={handleAnalyze}>
+        Analysis
+      </Button>
+      {/* <Typography variant="h4" sx={{ mt: 2 }}>Details</Typography> */}
+      <Box className="incident-details" sx={{ textAlign: 'left', mt: 4 }}>
+        <Box>
           <Typography variant="h6">Attacker</Typography>
           <Typography>Source IP: {incident.SourceIP}</Typography>
           <Typography>Source Port: {incident.SourcePort}</Typography>
           <Typography>Source Latitude: {incident.SourceLatitude}</Typography>
           <Typography>Source Longitude: {incident.SourceLongitude} </Typography>
         </Box>
-        <Box mt={2}>
+        <Box>
           <Typography variant="h6">Victim</Typography>
           <Typography>Target IP: {incident.DestinationIP}</Typography>
           <Typography>Target Port: {incident.DestinationPort}</Typography>
@@ -40,7 +43,7 @@ function IncidentDetails({ incident }) {
           <Typography>User Information: {incident.UserInfo}</Typography>
           <Typography>Geolocation: {incident.GeoLocation}</Typography>
         </Box>
-        <Box mt={2}>
+        <Box>
           <Typography variant="h6">Network Traffic</Typography>
           <Typography>Protocol: {incident.Protocol}</Typography>
           <Typography>Packet Length: {incident.PacketLength}</Typography>
@@ -48,7 +51,7 @@ function IncidentDetails({ incident }) {
           <Typography>Traffic Type: {incident.TrafficType}</Typography>
           <Typography>Segment: {incident.Segment}</Typography>
         </Box>
-        <Box mt={2}>
+        <Box>
           <Typography variant="h6">Response</Typography>
           <Typography>Anomaly Scores: {incident.AnomalyScores}</Typography>
           <Typography>Action Taken: {incident.ActionTaken}</Typography>
@@ -56,9 +59,7 @@ function IncidentDetails({ incident }) {
           <Typography>Log Source: {incident.LogSource}</Typography>
         </Box>
       </Box>
-      <Button variant="contained" color="primary" onClick={handleAnalyze} sx={{ mt: 2 }}>
-        Analysis
-      </Button>
+      
 
       <Modal open={isAnalysisModalOpen} onClose={handleCloseAnalysisModal}>
         <Box

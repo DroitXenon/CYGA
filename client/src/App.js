@@ -1,11 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField, Card, CardContent } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IncidentList from './components/IncidentList';
 import IncidentDetails from './components/IncidentDetails';
 import './App.css';
 import Globe from 'globe.gl';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
@@ -44,9 +52,12 @@ function App() {
   useEffect(() => {
     globeInstance.current = Globe()
       (globeEl.current)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
+      .width(window.innerWidth * 1.4)
+      .height(window.innerHeight - 64)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('#ffffff');
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
+
     globeInstance.current.pointOfView({
       lat: parseFloat(43.466667),
       lng: parseFloat(-80.516670),
@@ -59,7 +70,7 @@ function App() {
     fetch(`http://localhost:5001/api/incidents`)
       .then(response => response.json())
       .then(data => setIncidentData(Array.isArray(data) ? data : []))
-      //.catch(error => console.error('Error fetching incident data:', error));
+      .catch(error => console.error('Error fetching incident data:', error));
   };
 
   const handleIncidentClick = (incident) => {
@@ -147,80 +158,83 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <AppBar position="sticky" >
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={handleBackClick} sx= {{ mr: 2 }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          CYGA Dashboard
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <div className="App">
+        <AppBar position="sticky">
+          <Toolbar>
+            <IconButton edge="start" color="inherit" aria-label="menu">
+              <MenuIcon />
+            </IconButton>
+            <IconButton color="inherit" onClick={handleBackClick} sx={{ mr: 2 }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              CYGA Dashboard
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-      <div style={{ position: 'relative' }}>
-        <div ref={globeEl} style={{ position: 'relative', left: 250}}></div>
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', backgroundColor: 'white', borderRight: '3px solid #ccc', padding: '25px' }}>
-          <Box className="table-container">
-            {selectedIncident ? (
-              <IncidentDetails incident={selectedIncident} />
-            ) : (
-              <IncidentList 
-                incidents={incidentData} 
-                onIncidentClick={handleIncidentClick} 
-                onSort={handleSort} 
-                onSelectIncident={handleSelectIncident} 
-                selectedIncidentIds={selectedIncidentIds} 
-                fetchIncidents={fetchIncidents}
-                setIncidentData={setIncidentData}
-                handleAddIncident={() => setIsAddModalOpen(true)}
-                handleDeleteIncidents={handleDeleteIncidents}
+        <div ref={globeEl}></div>
+
+        <Card sx={{ position: 'absolute', top: 100, left: 50, width: 550, height: 'calc(100vh - 150px)' }}>
+          <CardContent>
+            <Box className="table-container">
+              {selectedIncident ? (
+                <IncidentDetails incident={selectedIncident} />
+              ) : (
+                <IncidentList 
+                  incidents={incidentData} 
+                  onIncidentClick={handleIncidentClick} 
+                  onSort={handleSort} 
+                  onSelectIncident={handleSelectIncident} 
+                  selectedIncidentIds={selectedIncidentIds} 
+                  fetchIncidents={fetchIncidents}
+                  setIncidentData={setIncidentData}
+                  handleAddIncident={() => setIsAddModalOpen(true)}
+                  handleDeleteIncidents={handleDeleteIncidents}
+                />
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+
+        <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
+          <Box
+            sx={{
+              p: 3,
+              mx: 'auto',
+              mt: 5,
+              maxWidth: 500,
+              maxHeight: '80vh',
+              overflow: 'auto',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Add
+            </Typography>
+            {Object.keys(newIncident).map((field) => (
+              <TextField
+                key={field}
+                label={field}
+                name={field}
+                value={newIncident[field]}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
               />
-            )}
+            ))}
+            <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ mt: 2 }}>
+              Add Incident
+            </Button>
           </Box>
-        </div>
+        </Modal>
+
       </div>
-
-
-      <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-        <Box
-          sx={{
-            p: 3,
-            mx: 'auto',
-            mt: 5,
-            maxWidth: 500,
-            maxHeight: '80vh',
-            overflow: 'auto',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Add
-          </Typography>
-          {Object.keys(newIncident).map((field) => (
-            <TextField
-              key={field}
-              label={field}
-              name={field}
-              value={newIncident[field]}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-            />
-          ))}
-          <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ mt: 2 }}>
-            Add Incident
-          </Button>
-        </Box>
-      </Modal>
-
-    </div>
+    </ThemeProvider>
   );
 }
 

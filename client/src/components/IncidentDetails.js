@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Box, Typography, Modal, Paper } from '@mui/material';
+import { SpeedDial, SpeedDialIcon, SpeedDialAction,  Button, Box, Typography, Modal, Paper } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 const darkTheme = createTheme({
   palette: {
@@ -33,7 +34,7 @@ function IncidentDetails({ incident }) {
       <CssBaseline />
       <Box sx={{ textAlign: 'center'}}>
         {/* <Typography variant="h5" sx={{ mt: 2 }}>Details</Typography> */}
-        <Box className="incident-details" sx={{ textAlign: 'left'}}>
+        <Box className="incident-details" sx={{ textAlign: 'left', mt: 2}}>
           <Box>
             <Typography variant="h6">Attacker</Typography>
             <Typography>Source IP: {incident.SourceIP}</Typography>
@@ -45,8 +46,6 @@ function IncidentDetails({ incident }) {
             <Typography variant="h6">Victim</Typography>
             <Typography>Target IP: {incident.DestinationIP}</Typography>
             <Typography>Target Port: {incident.DestinationPort}</Typography>
-            <Typography>Target Latitude: {incident.DestinationLatitude}</Typography>
-            <Typography>Target Longitude: {incident.DestinationLongitude} </Typography>
             <Typography>User Information: {incident.UserInfo}</Typography>
             <Typography>Geolocation: {incident.GeoLocation}</Typography>
           </Box>
@@ -66,9 +65,20 @@ function IncidentDetails({ incident }) {
             <Typography>Log Source: {incident.LogSource}</Typography>
           </Box>
         </Box>
-        <Button variant="outlined" color="primary" onClick={handleAnalyze}>
-          Analysis
-        </Button>
+        <Box sx={{ flexGrow: 1 }}>
+          <SpeedDial
+            ariaLabel="SpeedDial basic example"
+            sx={{ position: 'absolute', bottom: 16, right: 16 }}
+            icon={<SpeedDialIcon />}
+          >
+            <SpeedDialAction
+              icon={<AnalyticsIcon />}
+              tooltipTitle="Analysis"
+              onClick={handleAnalyze}
+            />
+          </SpeedDial>
+        </Box>
+        
 
         <Modal open={isAnalysisModalOpen} onClose={handleCloseAnalysisModal}>
           <Box

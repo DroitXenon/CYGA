@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField } from '@mui/material';
+import React, { useRef, useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField, Card, CardContent } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IncidentList from './components/IncidentList';
 import IncidentDetails from './components/IncidentDetails';
 import './App.css';
+import Globe from 'globe.gl';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
   const [selectedIncident, setSelectedIncident] = useState(null);
@@ -13,8 +22,12 @@ function App() {
   const [newIncident, setNewIncident] = useState({
     SourceIP: '',
     SourcePort: '',
+    SourceLatitude: '',
+    SourceLongitude: '',
     DestinationIP: '',
     DestinationPort: '',
+    DestinationLatitude: '',
+    DestinationLongitude: '',
     UserInfo: '',
     DeviceInfo: '',
     GeoLocation: '',
@@ -33,7 +46,23 @@ function App() {
   });
   const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
 
+  const globeEl = useRef();
+  const globeInstance = useRef(null);
+
   useEffect(() => {
+    globeInstance.current = Globe()
+      (globeEl.current)
+      .width(window.innerWidth * 1.4)
+      .height(window.innerHeight - 64)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
+
+    globeInstance.current.pointOfView({
+      lat: parseFloat(43.466667),
+      lng: parseFloat(-80.516670),
+      altitude: 3
+    }, 1500);
     fetchIncidents();
   }, []);
 
@@ -46,10 +75,38 @@ function App() {
 
   const handleIncidentClick = (incident) => {
     setSelectedIncident(incident);
+    const { SourceLatitude, SourceLongitude, DestinationLatitude, DestinationLongitude } = incident;
+    const arcsData = [
+      {
+        startLat: parseFloat(SourceLatitude),
+        startLng: parseFloat(SourceLongitude),
+        endLat: parseFloat(DestinationLatitude),
+        endLng: parseFloat(DestinationLongitude),
+      }
+    ];
+    globeInstance.current
+      .arcsData(arcsData)
+      .arcColor(() => ['#0252FB', '#C0D3FA'])
+      .arcDashLength(0.5)
+      .arcDashGap(0.5)
+      .arcDashInitialGap(() => Math.random())
+      .arcStroke(() => 0.7)
+      .arcDashAnimateTime(1500);
+    globeInstance.current.pointOfView({
+      lat: parseFloat(DestinationLatitude),
+      lng: parseFloat(DestinationLongitude),
+      altitude: 2
+    }, 2000);
   };
 
   const handleBackClick = () => {
     setSelectedIncident(null);
+    globeInstance.current.arcsData([]);
+    globeInstance.current.pointOfView({
+      lat: parseFloat(43.466667),
+      lng: parseFloat(-80.516670),
+      altitude: 3
+    }, 2000);
   };
 
   const handleSort = (column, order) => {
@@ -101,71 +158,83 @@ function App() {
   };
 
   return (
-    <Container>
-      <AppBar position="absolute">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Dashboard
-          </Typography>
-          <IconButton color="inherit" onClick={handleBackClick}>
-            <HomeIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ mt: 12 }}>
-        {selectedIncident ? (
-          <IncidentDetails incident={selectedIncident} />
-        ) : (
-          <IncidentList 
-            incidents={incidentData} 
-            onIncidentClick={handleIncidentClick} 
-            onSort={handleSort} 
-            onSelectIncident={handleSelectIncident} 
-            selectedIncidentIds={selectedIncidentIds} 
-            fetchIncidents={fetchIncidents}
-            setIncidentData={setIncidentData}
-            handleAddIncident={() => setIsAddModalOpen(true)}
-            handleDeleteIncidents={handleDeleteIncidents}
-          />
-        )}
-      </Box>
-      <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-        <Box
-          sx={{
-            p: 3,
-            mx: 'auto',
-            mt: 5,
-            maxWidth: 500,
-            maxHeight: '80vh',
-            overflow: 'auto',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Add
-          </Typography>
-          {Object.keys(newIncident).map((field) => (
-            <TextField
-              key={field}
-              label={field}
-              name={field}
-              value={newIncident[field]}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-            />
-          ))}
-          <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ mt: 2 }}>
-            Add Incident
-          </Button>
-        </Box>
-      </Modal>
-    </Container>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <div className="App">
+        <AppBar position="sticky">
+          <Toolbar>
+            <IconButton edge="start" color="inherit" aria-label="menu">
+              <MenuIcon />
+            </IconButton>
+            <IconButton color="inherit" onClick={handleBackClick} sx={{ mr: 2 }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              CYGA Dashboard
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
+        <div ref={globeEl}></div>
+
+        <Card sx={{ position: 'absolute', top: 100, left: 50, width: 550, height: 'calc(100vh - 150px)' }}>
+          <CardContent>
+            <Box className="table-container">
+              {selectedIncident ? (
+                <IncidentDetails incident={selectedIncident} />
+              ) : (
+                <IncidentList 
+                  incidents={incidentData} 
+                  onIncidentClick={handleIncidentClick} 
+                  onSort={handleSort} 
+                  onSelectIncident={handleSelectIncident} 
+                  selectedIncidentIds={selectedIncidentIds} 
+                  fetchIncidents={fetchIncidents}
+                  setIncidentData={setIncidentData}
+                  handleAddIncident={() => setIsAddModalOpen(true)}
+                  handleDeleteIncidents={handleDeleteIncidents}
+                />
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+
+        <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
+          <Box
+            sx={{
+              p: 3,
+              mx: 'auto',
+              mt: 5,
+              maxWidth: 500,
+              maxHeight: '80vh',
+              overflow: 'auto',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Add
+            </Typography>
+            {Object.keys(newIncident).map((field) => (
+              <TextField
+                key={field}
+                label={field}
+                name={field}
+                value={newIncident[field]}
+                onChange={handleInputChange}
+                fullWidth
+                margin="normal"
+              />
+            ))}
+            <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ mt: 2 }}>
+              Add Incident
+            </Button>
+          </Box>
+        </Modal>
+
+      </div>
+    </ThemeProvider>
   );
 }
 

@@ -67,9 +67,10 @@ function IncidentDetails({ incident }) {
         </Box>
         <Box sx={{ flexGrow: 1 }}>
           <SpeedDial
-            ariaLabel="SpeedDial basic example"
-            sx={{ position: 'absolute', bottom: 16, right: 16 }}
+            ariaLabel="SpeedDial"
+            sx={{ position: 'absolute', bottom: 10, right: 10 }}
             icon={<SpeedDialIcon />}
+            FabProps={{ color: 'outline' }}
           >
             <SpeedDialAction
               icon={<AnalyticsIcon />}

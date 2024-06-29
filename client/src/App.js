@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField, Card, CardContent } from '@mui/material';
+import { CssBaseline, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField, Card, CardContent } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IncidentList from './components/IncidentList';
 import IncidentDetails from './components/IncidentDetails';
-import './App.css';
 import Globe from 'globe.gl';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import './App.css';
 
 const darkTheme = createTheme({
   palette: {
@@ -157,6 +157,10 @@ function App() {
     setNewIncident({ ...newIncident, [name]: value });
   };
 
+  const handleGithub = () => {
+    window.open('https://github.com/DroitXenon/CYGA', '_blank');
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -172,6 +176,9 @@ function App() {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               CYGA Dashboard
             </Typography>
+            <IconButton color="inherit" onClick={handleGithub}>
+              <GitHubIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 

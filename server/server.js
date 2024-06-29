@@ -84,6 +84,7 @@ async function initializeDatabase() {
     await db.execute(query);
   }
 
+  console.log('Database initialized and tables created.');
   importCSV();
 }
 

@@ -18,17 +18,17 @@ body {
   overflow-y: auto;
 }
 
-.incident-details {
+/* .incident-details {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
 }
 
 .incident-details div {
-  width: 80%;
+  width: 45%;
   padding: 15px;
   border: 1px solid #ccc;
   border-radius: 10px;
-  margin-bottom: 10px;
-}
+  margin-bottom: 20px;
+} */
 

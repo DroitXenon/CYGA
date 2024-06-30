@@ -36,10 +36,8 @@ function IncidentDetails({ incident }) {
   const [viewData, setViewData] = useState([]);
 
   const columnOptions = [
-    'SourceIP', 'SourcePort', 'SourceLatitude', 'SourceLongitude',
-    'DestinationIP', 'DestinationPort', 'DestinationLatitude', 'DestinationLongitude',
-    'UserInfo', 'DeviceInfo', 'GeoLocation', 'Protocol', 'PacketLength', 'PacketType',
-    'TrafficType', 'Segment', 'AnomalyScores', 'ActionTaken', 'SeverityLevel', 'LogSource'
+    'DeviceInfo', 'GeoLocation', 'Protocol', 'PacketLength', 'PacketType',
+    'TrafficType', 'Segment', 'SeverityLevel', 'LogSource'
   ];
 
   const handleAnalyze = () => {
@@ -206,7 +204,7 @@ function IncidentDetails({ incident }) {
               Customize View Table
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <Paper sx={{ width: 200, height: 230, overflow: 'auto' }}>
+              <Paper sx={{ width: '60%', height: 400, overflow: 'auto' }}>
                 <FormGroup>
                   {columnOptions.map((option) => (
                     <FormControlLabel
@@ -234,8 +232,7 @@ function IncidentDetails({ incident }) {
           anchor="right"
           open={isViewDataDrawerOpen}
           onClose={handleCloseViewDataDrawer}
-          sx={{ width: 500, flexShrink: 0 }}
-          PaperProps={{ sx: { width: 500 } }}
+          PaperProps={{ sx: { width: 700 } }}
         >
           <Box
             sx={{
@@ -248,8 +245,8 @@ function IncidentDetails({ incident }) {
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant="h5">
-                View Data
+              <Typography variant="h6" sx={{ mt: 1 }}>
+                Customized Table
               </Typography>
               <IconButton onClick={handleCloseViewDataDrawer}>
                 <CloseIcon />

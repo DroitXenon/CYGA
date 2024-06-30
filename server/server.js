@@ -280,6 +280,34 @@ app.post('/api/add', async (req, res) => {
   res.json({ message: 'Record added.' });
 });
 
+app.post('/api/create-view', async (req, res) => {
+  const { columns } = req.body;
+
+  if (!columns || columns.length === 0) {
+    return res.status(400).json({ error: 'No columns specified' });
+  }
+
+  const columnList = ['v.id', ...columns].join(', ');
+  const query = `
+    CREATE VIEW custom_view AS
+    SELECT ${columnList}
+    FROM incident i
+    JOIN response r ON i.responseId = r.id
+    JOIN network_traffic n ON r.networkTrafficId = n.id
+    JOIN victim v ON n.victimId = v.id
+    JOIN attacker a ON v.attackerId = a.id;
+  `;
+
+  await db.query('DROP VIEW IF EXISTS custom_view;');
+  await db.query(query);
+  res.json({ message: 'View created successfully' });
+});
+
+app.get('/api/view-data', async (req, res) => {
+  const [results] = await db.query('SELECT * FROM custom_view');
+  res.json(results);
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

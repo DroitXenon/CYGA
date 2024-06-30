@@ -321,9 +321,15 @@ app.post('/api/update', async (req, res) => {
     WHERE i.id = ?
   `;
 
-  await db.query(query, [column, value, id]);
-  console.log(column, value, id);
-  res.json({ message: 'Record updated.' });
+  try {
+    await db.query(query, [column, value, id]);
+    console.log('Record updated.') 
+    console.log(column, value, id);
+    res.json({ message: 'Record updated.' });
+  } catch (error) {
+    console.error('Error updating record:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.listen(port, () => {

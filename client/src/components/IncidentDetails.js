@@ -39,8 +39,10 @@ function IncidentDetails({ incident }) {
   const [newValue, setNewValue] = useState('');
 
   const columnOptions = [
-    'DeviceInfo', 'GeoLocation', 'Protocol', 'PacketLength', 'PacketType',
-    'TrafficType', 'Segment', 'SeverityLevel', 'LogSource'
+    'SourceIP', 'SourcePort', 'SourceLatitude', 'SourceLongitude',
+    'DestinationIP', 'DestinationPort', 'DestinationLatitude', 'DestinationLongitude',
+    'UserInfo', 'DeviceInfo', 'GeoLocation', 'Protocol', 'PacketLength', 'PacketType',
+    'TrafficType', 'Segment', 'AnomalyScores', 'ActionTaken', 'SeverityLevel', 'LogSource'
   ];
 
   const handleAnalyze = () => {
@@ -79,7 +81,7 @@ function IncidentDetails({ incident }) {
   };
 
   const handleUpdateIncident = () => {
-    fetch(`http://localhost:5001/api/update-incident`, {
+    fetch(`http://localhost:5001/api/update`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: incident.id, column: selectedColumn, value: newValue })
@@ -90,6 +92,7 @@ function IncidentDetails({ incident }) {
         setIsEditModalOpen(false);
       })
       .catch(error => console.error('Error updating incident:', error));
+      window.location.href = window.location.href;
   };
 
   const handleCloseAnalysisModal = () => {

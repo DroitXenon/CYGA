@@ -133,6 +133,7 @@ function IncidentDetails({ incident }) {
               Source Port: {incident.SourcePort}<br />
               Source Latitude: {incident.SourceLatitude}<br />
               Source Longitude: {incident.SourceLongitude}
+              {/* TODO: Change font size */}
             </Item>
           </Grid>
           <Grid item xs={6} sx={{ display: 'flex' }}>

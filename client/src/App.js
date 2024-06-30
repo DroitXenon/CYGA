@@ -53,7 +53,7 @@ function App() {
     globeInstance.current = Globe()
       (globeEl.current)
       .width(window.innerWidth * 1.4)
-      .height(window.innerHeight - 64)
+      .height(window.innerHeightm * 1.4)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
@@ -164,7 +164,7 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div className="App">
+      <div className="app">
         <AppBar position="sticky">
           <Toolbar>
             <IconButton edge="start" color="inherit" aria-label="menu">
@@ -184,7 +184,7 @@ function App() {
 
         <div ref={globeEl}></div>
 
-        <Card sx={{ position: 'absolute', top: 100, left: 50, width: 550, height: 'calc(100vh - 150px)' }}>
+        <Card sx={{ position: 'absolute', top: 100, left: 50, width: '40%', height: 'calc(100vh - 150px)' }}>
           <CardContent>
             <Box className="table-container">
               {selectedIncident ? (

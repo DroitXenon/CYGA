@@ -6,29 +6,17 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .app {
-  display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 .table-container {
   height: calc(100vh - 100px);
   overflow-y: auto;
 }
-
-/* .incident-details {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-}
-
-.incident-details div {
-  width: 45%;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin-bottom: 20px;
-} */
 

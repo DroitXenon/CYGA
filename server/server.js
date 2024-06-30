@@ -309,6 +309,23 @@ app.get('/api/view-data', async (req, res) => {
   res.json(results);
 });
 
+app.post('/api/update', async (req, res) => {
+  const { id, column, value } = req.body;
+  const query = `
+    UPDATE incident i
+    JOIN response r ON i.responseId = r.id
+    JOIN network_traffic n ON r.networkTrafficId = n.id
+    JOIN victim v ON n.victimId = v.id
+    JOIN attacker a ON v.attackerId = a.id
+    SET ?? = ?
+    WHERE i.id = ?
+  `;
+
+  await db.query(query, [column, value, id]);
+  console.log(column, value, id);
+  res.json({ message: 'Record updated.' });
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

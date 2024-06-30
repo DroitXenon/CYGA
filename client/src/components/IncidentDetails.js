@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody, Drawer, IconButton, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody, Drawer, IconButton, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, TextField } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -31,9 +31,12 @@ function IncidentDetails({ incident }) {
   const [analysisReport, setAnalysisReport] = useState(null);
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewDataDrawerOpen, setIsViewDataDrawerOpen] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [viewData, setViewData] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [newValue, setNewValue] = useState('');
 
   const columnOptions = [
     'DeviceInfo', 'GeoLocation', 'Protocol', 'PacketLength', 'PacketType',
@@ -75,6 +78,20 @@ function IncidentDetails({ incident }) {
       .catch(error => console.error('Error fetching view data:', error));
   };
 
+  const handleUpdateIncident = () => {
+    fetch(`http://localhost:5001/api/update-incident`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: incident.id, column: selectedColumn, value: newValue })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Incident updated:', data);
+        setIsEditModalOpen(false);
+      })
+      .catch(error => console.error('Error updating incident:', error));
+  };
+
   const handleCloseAnalysisModal = () => {
     setIsAnalysisModalOpen(false);
     setAnalysisReport(null);
@@ -86,6 +103,10 @@ function IncidentDetails({ incident }) {
 
   const handleCloseViewDataDrawer = () => {
     setIsViewDataDrawerOpen(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
   };
 
   const handleCheckboxChange = (event) => {
@@ -143,8 +164,8 @@ function IncidentDetails({ incident }) {
             </Item>
           </Grid>
         </Grid>
-        <Box sx={{ mt: 6 }} align= 'center'>
-          <Fab color="secondary" aria-label="edit" size='medium'>
+        <Box sx={{ mt: 6 }} align='center'>
+          <Fab color="secondary" aria-label="edit" size='medium' onClick={() => setIsEditModalOpen(true)}>
             <EditIcon />
           </Fab>
           <Fab color="primary" aria-label="view" size='medium' onClick={() => setIsViewModalOpen(true)} sx={{ ml: 2 }}>
@@ -224,6 +245,48 @@ function IncidentDetails({ incident }) {
             </Box>
             <Button variant="contained" color="primary" onClick={handleCreateView} sx={{ mt: 2 }}>
               Create
+            </Button>
+          </Box>
+        </Modal>
+
+        <Modal open={isEditModalOpen} onClose={handleCloseEditModal} align='center'>
+          <Box
+            sx={{
+              p: 3,
+              mx: 'auto',
+              mt: '30vh',
+              maxWidth: '40%',
+              maxHeight: '40%',
+              overflow: 'auto',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h5">
+              Edit Incident
+            </Typography>
+            <Select
+              value={selectedColumn}
+              onChange={(e) => setSelectedColumn(e.target.value)}
+              displayEmpty
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              <MenuItem value="" disabled>Select Attribute</MenuItem>
+              {columnOptions.map((option) => (
+                <MenuItem key={option} value={option}>{option}</MenuItem>
+              ))}
+            </Select>
+            <TextField
+              value={newValue}
+              onChange={(e) => setNewValue(e.target.value)}
+              label="New Value"
+              fullWidth
+              sx={{ mt: 2 }}
+            />
+            <Button variant="contained" color="primary" onClick={handleUpdateIncident} sx={{ mt: 2 }}>
+              Confirm
             </Button>
           </Box>
         </Modal>

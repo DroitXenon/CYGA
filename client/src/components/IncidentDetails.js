@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody, Drawer, IconButton, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
-import TransferList from './TransferList';
 import CssBaseline from '@mui/material/CssBaseline';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import PersonIcon from '@mui/icons-material/Person';
@@ -12,6 +11,7 @@ import PublicIcon from '@mui/icons-material/Public';
 import BackHandIcon from '@mui/icons-material/BackHand';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 
 const darkTheme = createTheme({
   palette: {
@@ -31,7 +31,7 @@ function IncidentDetails({ incident }) {
   const [analysisReport, setAnalysisReport] = useState(null);
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isViewDataModalOpen, setIsViewDataModalOpen] = useState(false);
+  const [isViewDataDrawerOpen, setIsViewDataDrawerOpen] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [viewData, setViewData] = useState([]);
 
@@ -61,6 +61,7 @@ function IncidentDetails({ incident }) {
       .then(response => response.json())
       .then(data => {
         console.log('View created:', data);
+        setIsViewModalOpen(false);  // Close the modal
         fetchViewData();
       })
       .catch(error => console.error('Error creating view:', error));
@@ -71,7 +72,7 @@ function IncidentDetails({ incident }) {
       .then(response => response.json())
       .then(data => {
         setViewData(Array.isArray(data) ? data : []);
-        setIsViewDataModalOpen(true);
+        setIsViewDataDrawerOpen(true);
       })
       .catch(error => console.error('Error fetching view data:', error));
   };
@@ -85,8 +86,15 @@ function IncidentDetails({ incident }) {
     setIsViewModalOpen(false);
   };
 
-  const handleCloseViewDataModal = () => {
-    setIsViewDataModalOpen(false);
+  const handleCloseViewDataDrawer = () => {
+    setIsViewDataDrawerOpen(false);
+  };
+
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setSelectedColumns((prevSelected) =>
+      checked ? [...prevSelected, name] : prevSelected.filter((column) => column !== name)
+    );
   };
 
   return (
@@ -137,26 +145,27 @@ function IncidentDetails({ incident }) {
             </Item>
           </Grid>
         </Grid>
-        <Box sx={{ position: 'absolute', bottom: 60, left: '50%', transform: 'translateX(-50%)', flexGrow: 1 }}>
-          <Fab color="primary" aria-label="view" size='medium' onClick={() => setIsViewModalOpen(true)}>
-            <VisibilityIcon />
-          </Fab>
-          <Fab color="secondary" aria-label="edit" size='medium' sx={{ ml: 1 }}>
+        <Box sx={{ mt: 6 }} align= 'center'>
+          <Fab color="secondary" aria-label="edit" size='medium'>
             <EditIcon />
           </Fab>
-          <Fab variant="extended" onClick={handleAnalyze} sx={{ ml: 1 }}>
+          <Fab color="primary" aria-label="view" size='medium' onClick={() => setIsViewModalOpen(true)} sx={{ ml: 2 }}>
+            <VisibilityIcon />
+          </Fab>
+          <Fab variant="extended" onClick={handleAnalyze} sx={{ ml: 2 }}>
             <AnalyticsIcon sx={{ mr: 1 }} />
             Analysis
           </Fab>
         </Box>
+        
         <Modal open={isAnalysisModalOpen} onClose={handleCloseAnalysisModal} align='center'>
           <Box
             sx={{
               p: 3,
               mx: 'auto',
-              mt: '20vh',
-              maxWidth: 500,
-              maxHeight: '80vh',
+              mt: '30vh',
+              maxWidth: '40%',
+              maxHeight: '40%',
               overflow: 'auto',
               bgcolor: 'background.paper',
               boxShadow: 24,
@@ -178,6 +187,7 @@ function IncidentDetails({ incident }) {
             </Button>
           </Box>
         </Modal>
+        
         <Modal open={isViewModalOpen} onClose={handleCloseViewModal} align='center'>
           <Box
             sx={{
@@ -193,36 +203,59 @@ function IncidentDetails({ incident }) {
             }}
           >
             <Typography variant="h5">
-              Select Columns for View
+              Customize View Table
             </Typography>
-            <TransferList
-              options={columnOptions}
-              selectedOptions={selectedColumns}
-              setSelectedOptions={setSelectedColumns}
-            />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Paper sx={{ width: 200, height: 230, overflow: 'auto' }}>
+                <FormGroup>
+                  {columnOptions.map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      control={
+                        <Checkbox
+                          name={option}
+                          checked={selectedColumns.includes(option)}
+                          onChange={handleCheckboxChange}
+                        />
+                      }
+                      label={option}
+                    />
+                  ))}
+                </FormGroup>
+              </Paper>
+            </Box>
             <Button variant="contained" color="primary" onClick={handleCreateView} sx={{ mt: 2 }}>
-              Create View
+              Create
             </Button>
           </Box>
         </Modal>
-        <Modal open={isViewDataModalOpen} onClose={handleCloseViewDataModal} align='center'>
+
+        <Drawer
+          anchor="right"
+          open={isViewDataDrawerOpen}
+          onClose={handleCloseViewDataDrawer}
+          sx={{ width: 500, flexShrink: 0 }}
+          PaperProps={{ sx: { width: 500 } }}
+        >
           <Box
             sx={{
               p: 3,
-              mx: 'auto',
-              mt: '20vh',
-              maxWidth: 800,
-              maxHeight: '80vh',
-              overflow: 'auto',
+              maxWidth: '100%',
               bgcolor: 'background.paper',
               boxShadow: 24,
               borderRadius: 2,
+              overflowX: 'auto'
             }}
           >
-            <Typography variant="h5">
-              View Data
-            </Typography>
-            <Paper sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h5">
+                View Data
+              </Typography>
+              <IconButton onClick={handleCloseViewDataDrawer}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Paper sx={{ p: 2, overflowX: 'auto' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -242,11 +275,8 @@ function IncidentDetails({ incident }) {
                 </TableBody>
               </Table>
             </Paper>
-            <Button variant="outlined" color="primary" onClick={handleCloseViewDataModal} sx={{ mt: 2 }}>
-              Close
-            </Button>
           </Box>
-        </Modal>
+        </Drawer>
       </Box>
     </ThemeProvider>
   );

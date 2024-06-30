@@ -211,20 +211,20 @@ app.get('/api/analysis/:id', async (req, res) => {
   let reportStatement;
   switch (reportLevel) {
     case 'Low':
-      reportStatement = `The incident has a low severity level based on the network traffic packet length. It is recommended to review the traffic and ensure no unusual patterns are ignored.`;
+      reportStatement = `has a low severity level based on the network traffic packet length. It is recommended to review the traffic and ensure no unusual patterns are ignored.`;
       break;
     case 'Medium':
-      reportStatement = `The incident has a medium severity level based on the network traffic packet length. Further investigation is required to determine if there is any malicious activity.`;
+      reportStatement = `has a medium severity level based on the network traffic packet length. Further investigation is required to determine if there is any malicious activity.`;
       break;
     case 'High':
-      reportStatement = `The incident has a high severity level based on the network traffic packet length. Immediate action is required to mitigate potential threats and protect the network.`;
+      reportStatement = `has a high severity level based on the network traffic packet length. Immediate action is required to mitigate potential threats and protect the network.`;
       break;
     default:
-      reportStatement = `The severity level of the incident could not be determined. Please review the incident manually.`;
+      reportStatement = `'s severity level of the incident could not be determined. Please review the incident manually.`;
   }
 
   const report = {
-    report: `Report for Incident ID: ${id}. ${reportStatement}`
+    report: `Incident ID: ${id} ${reportStatement}`
   };
 
   res.json(report);
@@ -289,7 +289,7 @@ app.post('/api/create-view', async (req, res) => {
 
   const columnList = ['v.id', ...columns].join(', ');
   const query = `
-    CREATE VIEW custom_view AS
+    CREATE VIEW view_table AS
     SELECT ${columnList}
     FROM incident i
     JOIN response r ON i.responseId = r.id
@@ -298,13 +298,14 @@ app.post('/api/create-view', async (req, res) => {
     JOIN attacker a ON v.attackerId = a.id;
   `;
 
-  await db.query('DROP VIEW IF EXISTS custom_view;');
+  await db.query('DROP VIEW IF EXISTS view_table;');
   await db.query(query);
-  res.json({ message: 'View created successfully' });
+  console.log('View Table created.');
+  res.json({ message: 'View Table created.' });
 });
 
 app.get('/api/view-data', async (req, res) => {
-  const [results] = await db.query('SELECT * FROM custom_view');
+  const [results] = await db.query('SELECT * FROM view_table');
   res.json(results);
 });
 

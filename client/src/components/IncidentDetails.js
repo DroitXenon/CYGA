@@ -10,6 +10,7 @@ import SkateboardingIcon from '@mui/icons-material/Skateboarding';
 import PublicIcon from '@mui/icons-material/Public';
 import BackHandIcon from '@mui/icons-material/BackHand';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 
 const darkTheme = createTheme({
   palette: {
@@ -93,10 +94,13 @@ function IncidentDetails({ incident }) {
           </Grid>
         </Grid>
         <Box sx={{ position: 'absolute', bottom: 60, left: '50%', transform: 'translateX(-50%)', flexGrow: 1 }}>
-          <Fab color="primary" aria-label="add" size='medium'>
+          <Fab color="primary" aria-label="view" size='medium'>
             <VisibilityIcon />
           </Fab>
-          <Fab variant="extended" onClick={handleAnalyze} sx={{ ml: 2 }}>
+          <Fab color="secondary" aria-label="edit" size='medium' sx={{ ml: 1 }}>
+            <EditIcon />
+          </Fab>
+          <Fab variant="extended" onClick={handleAnalyze} sx={{ ml: 1 }}>
             <AnalyticsIcon sx={{ mr: 1 }} />
             Analysis
           </Fab>
@@ -119,7 +123,7 @@ function IncidentDetails({ incident }) {
               Report
             </Typography>
             {analysisReport ? (
-              <Paper sx={{ p: 2 }}>
+              <Paper sx={{ mt: 2, p: 2 }}>
                 <Typography variant="body1" align='left'>{analysisReport.report}</Typography>
               </Paper>
             ) : (

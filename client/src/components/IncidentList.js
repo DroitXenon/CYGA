@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Paper, TableSortLabel, Checkbox, TextField, Button, Box, ButtonGroup} from '@mui/material';
 
 function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, selectedIncidentIds, fetchIncidents, setIncidentData, handleAddIncident, handleDeleteIncidents }) {
   const [sortColumn, setSortColumn] = useState('Timestamp');
@@ -26,26 +26,27 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
     }
   };
 
-
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
         <TextField
-          variant="outlined"
-          placeholder="Search..."
+          variant="standard"
+          placeholder="Search"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
           sx={{ mr: 2 }}
         />
-        <Button variant="contained" onClick={handleSearch}>
-          Search
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ ml: 2 }}>
-          Add
-        </Button>
-        <Button variant="contained" color="secondary" onClick={handleDeleteIncidents} sx={{ ml: 2 }}>
-          Delete
-        </Button>
+        <ButtonGroup variant="outlined" size="medium">
+          <Button onClick={handleSearch} >
+            Search
+          </Button>
+          <Button onClick={handleAddIncident} >
+            Add
+          </Button>
+          <Button color="secondary" onClick={handleDeleteIncidents}>
+            Delete
+          </Button>
+        </ButtonGroup>
       </Box>
       <TableContainer component={Paper}>
         <Table>

@@ -259,7 +259,7 @@ function IncidentDetails({ incident }) {
               p: 3,
               mx: 'auto',
               mt: '30vh',
-              maxWidth: '40%',
+              maxWidth: '30%',
               maxHeight: '40%',
               overflow: 'auto',
               bgcolor: 'background.paper',

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody, Drawer, IconButton, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, TextField } from '@mui/material';
+import { CssBaseline, styled,Fab, Modal, Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody, Drawer, IconButton, FormGroup, FormControlLabel, Checkbox, Select, MenuItem, TextField } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2';
-import CssBaseline from '@mui/material/CssBaseline';
+
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import PersonIcon from '@mui/icons-material/Person';
 import SkateboardingIcon from '@mui/icons-material/Skateboarding';
@@ -12,6 +11,8 @@ import BackHandIcon from '@mui/icons-material/BackHand';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
+import { jsPDF } from 'jspdf';
 
 const darkTheme = createTheme({
   palette: {
@@ -119,6 +120,50 @@ function IncidentDetails({ incident }) {
     );
   };
 
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    
+    const title = 'Incident Details';
+    const titleWidth = doc.getTextWidth(title);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const titleX = (pageWidth - titleWidth) / 2;
+    
+    doc.text(title, titleX, 20); 
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    
+    doc.text(`Incident ID: ${incident.id}`, 10, 40);
+    doc.text(`Timestamp: ${incident.Timestamp}`, 10, 50);
+    doc.text(`Attack Type: ${incident.AttackType}`, 10, 60);
+    doc.text(`Attack Signature: ${incident.AttackSignature}`, 10, 70);
+    doc.text(`Source IP: ${incident.SourceIP}`, 10, 80);
+    doc.text(`Source Port: ${incident.SourcePort}`, 10, 90);
+    doc.text(`Source Latitude: ${incident.SourceLatitude}`, 10, 100);
+    doc.text(`Source Longitude: ${incident.SourceLongitude}`, 10, 110);
+    doc.text(`Destination IP: ${incident.DestinationIP}`, 10, 120);
+    doc.text(`Destination Port: ${incident.DestinationPort}`, 10, 130);
+    doc.text(`Destination Latitude: ${incident.DestinationLatitude}`, 10, 140);
+    doc.text(`Destination Longitude: ${incident.DestinationLongitude}`, 10, 150);
+    doc.text(`User Information: ${incident.UserInfo}`, 10, 160);
+    doc.text(`Device Information: ${incident.DeviceInfo}`, 10, 170);
+    doc.text(`Geolocation: ${incident.GeoLocation}`, 10, 180);
+    doc.text(`Protocol: ${incident.Protocol}`, 10, 190);
+    doc.text(`Packet Length: ${incident.PacketLength}`, 10, 200);
+    doc.text(`Packet Type: ${incident.PacketType}`, 10, 210);
+    doc.text(`Traffic Type: ${incident.TrafficType}`, 10, 220);
+    doc.text(`Segment: ${incident.Segment}`, 10, 230);
+    doc.text(`Anomaly Scores: ${incident.AnomalyScores}`, 10, 240);
+    doc.text(`Action Taken: ${incident.ActionTaken}`, 10, 250);
+    doc.text(`Severity Level: ${incident.SeverityLevel}`, 10, 260);
+    doc.text(`Log Source: ${incident.LogSource}`, 10, 270);
+    
+    doc.save('incident_details.pdf');
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -174,6 +219,9 @@ function IncidentDetails({ incident }) {
           </Fab>
           <Fab color="primary" aria-label="view" size='medium' onClick={() => setIsViewModalOpen(true)} sx={{ ml: 2 }}>
             <VisibilityIcon />
+          </Fab>
+          <Fab aria-label="download" size='medium' onClick={generatePDF} sx={{ ml: 2 }}>
+            <DownloadIcon />
           </Fab>
           <Fab variant="extended" onClick={handleAnalyze} sx={{ ml: 2 }}>
             <AnalyticsIcon sx={{ mr: 1 }} />

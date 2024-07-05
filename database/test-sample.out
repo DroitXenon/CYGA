@@ -244,6 +244,7 @@ mysql> select * from incident;
 +----+------------+---------------------+-----------------+------------+
 1 row in set (0.01 sec)
 
+
 -- 7. View
 mysql> CREATE VIEW view_table AS
     -> SELECT AttackType,SeverityLevel

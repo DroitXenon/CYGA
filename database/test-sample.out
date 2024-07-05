@@ -262,3 +262,38 @@ mysql> SELECT *,
 |  1 | Malware    | 2024-06-01 06:33:58 | Known Pattern B |          1 |  1 | 60            | Logged      | Low           | Server    |                1 |  1 | ICMP     |          503 | Data       | HTTP        | Segment A |        1 |  1 | 84.9.164.252  |           17616 | Justin Wang | Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0) | Waterloo, Canada |          1 |  1 | 192.168.0.1 |       5001 | Medium      |
 +----+------------+---------------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+-------------+-----------------------------------------------------------------+------------------+------------+----+-------------+------------+-------------+
 1 row in set (0.00 sec)
+
+-- 6. Edit
+mysql> UPDATE incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id
+    -> SET i.AttackType = 'DDoS'
+    -> WHERE i.id = 1;
+
+mysql> select * from incident;
++----+------------+---------------------+-----------------+------------+
+| id | AttackType | Timestamp           | AttackSignature | responseId |
++----+------------+---------------------+-----------------+------------+
+|  1 | DDoS       | 2024-06-01 06:33:58 | Known Pattern B |          1 |
++----+------------+---------------------+-----------------+------------+
+1 row in set (0.00 sec)
+
+-- 7. View
+mysql> CREATE VIEW view_table AS
+    -> SELECT AttackType,SeverityLevel
+    -> FROM incident i
+    -> JOIN response r ON i.responseId = r.id
+    -> JOIN network_traffic n ON r.networkTrafficId = n.id
+    -> JOIN victim v ON n.victimId = v.id
+    -> JOIN attacker a ON v.attackerId = a.id;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM view_table;
++------------+---------------+
+| AttackType | SeverityLevel |
++------------+---------------+
+| DDoS       | Low           |
++------------+---------------+
+1 row in set (0.00 sec)

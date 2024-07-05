@@ -84,3 +84,24 @@ JOIN attacker a ON v.attackerId = a.id
 WHERE i.id = 1;
     --(Can change 2 to the IID user want)
 
+-- 6. Edit
+UPDATE incident i
+JOIN response r ON i.responseId = r.id
+JOIN network_traffic n ON r.networkTrafficId = n.id
+JOIN victim v ON n.victimId = v.id
+JOIN attacker a ON v.attackerId = a.id
+SET i.AttackType = 'Malware'
+WHERE i.id = 1;
+    --(Can change 1 to the IID user want)
+    --(Can change AttackType to the attribute user want)
+    --(Can change DDoS to the content user want)
+
+-- 7. View
+CREATE VIEW view_table AS
+SELECT AttackType,SeverityLevel
+FROM incident i
+JOIN response r ON i.responseId = r.id
+JOIN network_traffic n ON r.networkTrafficId = n.id
+JOIN victim v ON n.victimId = v.id
+JOIN attacker a ON v.attackerId = a.id;
+    --(Can change {AttackType,SeverityLevel} to the attributes column user want)

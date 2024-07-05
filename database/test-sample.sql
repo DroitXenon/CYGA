@@ -1,10 +1,11 @@
 -- File for C3 (Impl Part)
 
 -- First need to have a valid dataset (example)
-INSERT INTO attacker (SourceIP, SourcePort) VALUES ('192.168.0.1', 5001);
+INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude)
+VALUES ('192.168.0.1', 5001, 39.9042, 116.4074);
 
-INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId)
-VALUES ('84.9.164.252', 17616, 'Justin Wang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 1);
+INSERT INTO victim (DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId)
+VALUES ('84.9.164.252', 17616, 43.4723, 80.5449, 'Justin Wang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 1);
 
 INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
 VALUES ('ICMP', 503, 'Data', 'HTTP', 'Segment A', 1);
@@ -36,10 +37,10 @@ WHERE i.AttackType LIKE '%Malware%'
     -- (Here '' is a place holder, user can change to other words to search)
 
 -- 2.Add
-INSERT INTO attacker (SourceIP, SourcePort) 
-    VALUES ('192.168.0.2', 5000);
-INSERT INTO victim (DestinationIP, DestinationPort, UserInfo, DeviceInfo, GeoLocation, attackerId)
-    VALUES ('15.9.371.480', 85265, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
+INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude) 
+    VALUES ('192.168.0.2', 5000, 43.4765, 80.5391);
+INSERT INTO victim (DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId)
+    VALUES ('15.9.371.480', 85265, 43.4624, 80.5381, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
 INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
     VALUES ('ICMP', 4040, 'Data', 'HTTP', 'Segment B','2');
 INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
@@ -90,7 +91,7 @@ JOIN response r ON i.responseId = r.id
 JOIN network_traffic n ON r.networkTrafficId = n.id
 JOIN victim v ON n.victimId = v.id
 JOIN attacker a ON v.attackerId = a.id
-SET i.AttackType = 'Malware'
+SET i.AttackType = 'DDoS'
 WHERE i.id = 1;
     --(Can change 1 to the IID user want)
     --(Can change AttackType to the attribute user want)

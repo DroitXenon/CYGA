@@ -28,7 +28,8 @@ async function initializeDatabase() {
     password: dbConfig.password
   });
 
-  await db.query('CREATE DATABASE IF NOT EXISTS cyga;');
+  await db.query('DROP DATABASE IF EXISTS cyga;');
+  await db.query('CREATE DATABASE cyga;');
   await db.query('USE cyga;');
 
   const tableQueries = [

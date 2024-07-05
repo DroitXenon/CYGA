@@ -37,8 +37,6 @@ CYGA/
 │   ├── package.json      
 │   ├── package-lock.json 
 ├── database/             # Files required for C2 and C3
-│   ├── create-table-m.sql
-│   ├── create-table-xs.sql
 │   ├── create-table.sql
 │   ├── test-production.out
 │   ├── test-production.sql

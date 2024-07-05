@@ -6,14 +6,28 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 
 ![Demo GIF](shared/constants/demo.gif)
 
-Team Member
+## Table of Contents
+
+- [Team Member](#team-member)
+- [Directory Layout](#directory-layout)
+- [Data Scheme](#data-scheme)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Backend Setup](#backend-setup)
+    - [Frontend Setup](#frontend-setup)
+- [Usage](#usage)
+- [Technologies Used](#technologies-used)
+
+## Team Member
 -----------
 * [Yiran Dong](https://github.com/Rileyyiran)
 * [Liang He](https://github.com/zaizaijiayou)
 * [Yuqing Zhang](https://github.com/Yuqing-Zhang-branch)
 * [Justin Wang](https://github.com/DroitXenon)  
 
-Directory Layout
+## Directory Layout
 ----------------
 ```plaintext
 CYGA/
@@ -75,7 +89,7 @@ CYGA/
 ├── README.md             # Project README file
 ```
 
-Data Scheme
+## Data Scheme
 -----------
 <div align="center">
 <img src="shared/constants/erdiagram.jpeg"/>
@@ -83,7 +97,7 @@ Data Scheme
 <img src="shared/constants/Normalization.jpeg"/>
 </div>
 
-Features
+## Features
 --------
 - **Search:** The search feature is intended to help users, such as IT professionals and security analysts, easily find specific data within the cybersecurity database.
 
@@ -107,7 +121,7 @@ Features
 
 - **Export** The export feature provides users with the ability to easily export analysis data into a PDF format. This functionality allows users to compile and save comprehensive reports of their data analyses, facilitating convenient sharing and offline access. By using the "Export" button, users can generate a well-structured PDF document that includes all relevant analysis details, ensuring that important information is preserved and readily accessible. This feature is designed to enhance the user's experience by providing a seamless method for documenting and distributing analysis results.
 
-Getting Started
+## Getting Started
 ---------------
 ### Prerequisites
 - MySQL (Version >= 8.0)
@@ -175,7 +189,7 @@ Getting Started
     npm start
     ```
 
-Usage
+## Usage
 -----
 1. Open the browser and go to `http://localhost:3000`.
 2. View the cyber attack incidents in the table.
@@ -192,7 +206,7 @@ Usage
 13. Click the arrow to go back to the previous page.
 
 
-Technologies Used
+## Technologies Used
 -----------------
 - **Frontend:**
   - React: Utilizes a component-based architecture ensuring a dynamic and seamless user experience.

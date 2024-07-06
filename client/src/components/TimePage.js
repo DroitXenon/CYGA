@@ -46,6 +46,8 @@ function TimePage() {
                 ]}
                 xAxis={[{
                 data: years,
+                scaleType: 'band',
+                label: 'Year'
                 }]}
             />
         </Box>

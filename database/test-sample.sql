@@ -1,20 +1,5 @@
 -- File for C3 (Impl Part)
-
--- First need to have a valid dataset (example)
-INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude)
-VALUES ('192.168.0.1', 5001, 39.9042, 116.4074);
-
-INSERT INTO victim (DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId)
-VALUES ('84.9.164.252', 17616, 43.4723, 80.5449, 'Justin Wang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 1);
-
-INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
-VALUES ('ICMP', 503, 'Data', 'HTTP', 'Segment A', 1);
-
-INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
-VALUES ('60', 'Logged', 'Low', 'Server', 1);
-
-INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId)
-VALUES ('Malware', '2024-06-01 06:33:58', 'Known Pattern B', 1);
+-- By using our server.js file, a databae cyga will automatically provided in mysql 
 
 -- Show all the data (Not a feature)
 SELECT * FROM attacker;
@@ -23,8 +8,9 @@ SELECT * FROM network_traffic;
 SELECT * FROM response;
 SELECT * FROM incident;
 
--- There are five features:
--- 1.Search 
+-- There are six features:
+-- 1. Filter
+-- Search 
 SELECT *
 FROM incident i
 JOIN response r ON i.responseId = r.id
@@ -36,20 +22,7 @@ WHERE i.AttackType LIKE '%Malware%'
     OR i.Timestamp LIKE '2024-06-01 06:33:58';
     -- (Here '' is a place holder, user can change to other words to search)
 
--- 2.Add
-INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude) 
-    VALUES ('192.168.0.2', 5000, 43.4765, 80.5391);
-INSERT INTO victim (DestinationIP, DestinationPort, DestinationLatitude, DestinationLongitude, UserInfo, DeviceInfo, GeoLocation, attackerId)
-    VALUES ('15.9.371.480', 85265, 43.4624, 80.5381, 'Talia Zhang', 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/5.0)', 'Waterloo, Canada', 2);
-INSERT INTO network_traffic (Protocol, PacketLength, PacketType, TrafficType, Segment, victimId)
-    VALUES ('ICMP', 4040, 'Data', 'HTTP', 'Segment B','2');
-INSERT INTO response (AnomalyScores, ActionTaken, SeverityLevel, LogSource, networkTrafficId)
-    VALUES ('60', 'Logged', 'High', 'Server', 2);
-INSERT INTO incident (AttackType, Timestamp, AttackSignature, responseId)
-    VALUES ('Malware', '2024-06-02 03:55:01', 'Known Pattern A', 2);
-    -- (Can change whatever user want in VALUES(?,?))
-
--- 3.Sort 
+-- Sort 
 SELECT *
 FROM incident i
 JOIN response r ON i.responseId = r.id
@@ -59,18 +32,7 @@ JOIN attacker a ON v.attackerId = a.id
 ORDER BY i.Timestamp ASC; 
     -- (Can change the atrribute and order user want to re-order)
 
-
--- 4. Delete
-DELETE i, r, n, v, a
-FROM incident i
-JOIN response r ON i.responseId = r.id
-JOIN network_traffic n ON r.networkTrafficId = n.id
-JOIN victim v ON n.victimId = v.id
-JOIN attacker a ON v.attackerId = a.id
-WHERE i.id = 2;
-    --(Can change 2 to the IID user want)
-
--- 5. Analysis
+-- 2. Analysis
 SELECT *,
 CASE
     WHEN n.PacketLength < 500 THEN 'Low'
@@ -85,19 +47,7 @@ JOIN attacker a ON v.attackerId = a.id
 WHERE i.id = 1;
     --(Can change 2 to the IID user want)
 
--- 6. Edit
-UPDATE incident i
-JOIN response r ON i.responseId = r.id
-JOIN network_traffic n ON r.networkTrafficId = n.id
-JOIN victim v ON n.victimId = v.id
-JOIN attacker a ON v.attackerId = a.id
-SET i.AttackType = 'DDoS'
-WHERE i.id = 1;
-    --(Can change 1 to the IID user want)
-    --(Can change AttackType to the attribute user want)
-    --(Can change DDoS to the content user want)
-
--- 7. View
+-- 3. View
 CREATE VIEW view_table AS
 SELECT AttackType,SeverityLevel
 FROM incident i
@@ -106,3 +56,35 @@ JOIN network_traffic n ON r.networkTrafficId = n.id
 JOIN victim v ON n.victimId = v.id
 JOIN attacker a ON v.attackerId = a.id;
     --(Can change {AttackType,SeverityLevel} to the attributes column user want)
+
+-- 4. Timestamp
+SELECT *
+FROM incident i
+WHERE Timestamp < '2021/3/8 20:13'
+    AND Timestamp > '2020/9/7 4:50';
+
+-- 5. NetWork
+-- Summary Protocol attribute
+SELECT Protocol, COUNT(*) as count
+FROM network_traffic
+GROUP BY Protocol;
+
+-- Summary TrafficType attribute
+SELECT TrafficType, COUNT(*) as count
+FROM network_traffic
+GROUP BY TrafficType;
+
+-- 6. Victim
+-- Find the top three devices used for cyber attacks 
+SELECT DeviceInfo, COUNT(*) as count
+FROM victim
+GROUP BY DeviceInfo
+ORDER BY count DESC
+LIMIT 3;
+
+-- Find top three location with the most attacks
+SELECT GeoLocation, COUNT(*) as count
+FROM victim
+GROUP BY GeoLocation
+ORDER BY count DESC
+LIMIT 3;

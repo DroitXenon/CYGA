@@ -58,7 +58,7 @@ function App() {
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              CYGA Dashboard
+              Cyber Geolocation Analysis
             </Typography>
             <IconButton color="inherit" onClick={handleGithub}>
               <GitHubIcon />

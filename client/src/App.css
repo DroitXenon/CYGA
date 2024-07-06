@@ -19,5 +19,10 @@ body {
   overflow-y: auto;
 }
 
+.network {
+  margin: 50px;
+  display: flex;
+  overflow-y: auto;
+}
 
 

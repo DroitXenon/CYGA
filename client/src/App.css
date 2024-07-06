@@ -22,7 +22,11 @@ body {
 .network {
   margin: 50px;
   display: flex;
-  overflow-y: auto;
+}
+
+.victim {
+  margin: 20px;
+  display: flex;
 }
 
 

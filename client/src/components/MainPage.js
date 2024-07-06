@@ -147,7 +147,7 @@ function MainPage() {
   };
 
   return (
-    <div>
+    <div >
       <div ref={globeEl}></div>
       <Card sx={{ position: 'absolute', top: 100, left: 50, width: '40%', height: 'calc(100vh - 150px)' }}>
         <CardContent>

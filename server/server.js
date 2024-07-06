@@ -324,33 +324,60 @@ app.post('/api/update', async (req, res) => {
 
   try {
     await db.query(query, [column, value, id]);
-    console.log('Record updated.') 
+    console.log('Record updated.') ;
     console.log(column, value, id);
     res.json({ message: 'Record updated.' });
   } catch (error) {
     console.error('Error updating record:', error);
-    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
 app.get('/api/network-stats', async (req, res) => {
+  const [protocolResults] = await db.query(`
+    SELECT Protocol, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY Protocol;
+  `);
+
+  const [trafficTypeResults] = await db.query(`
+    SELECT TrafficType, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY TrafficType;
+  `);
+
+  res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
+});
+
+app.get('/api/victim-stats', async (req, res) => {
+  const [deviceInfoResults] = await db.query(`
+    SELECT DeviceInfo, COUNT(*) as count
+    FROM victim
+    GROUP BY DeviceInfo
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  const [geoLocationResults] = await db.query(`
+    SELECT GeoLocation, COUNT(*) as count
+    FROM victim
+    GROUP BY GeoLocation
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  res.json({
+    deviceInfoStats: deviceInfoResults,
+    geoLocationStats: geoLocationResults
+  });
+});
+
+app.get('/api/victims', async (req, res) => {
   try {
-    const [protocolResults] = await db.query(`
-      SELECT Protocol, COUNT(*) as count
-      FROM network_traffic
-      GROUP BY Protocol;
-    `);
-
-    const [trafficTypeResults] = await db.query(`
-      SELECT TrafficType, COUNT(*) as count
-      FROM network_traffic
-      GROUP BY TrafficType;
-    `);
-
-    res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
+    const [results] = await db.query('SELECT * FROM victim');
+    res.json(results);
   } catch (error) {
-    console.error('Error fetching network stats:', error);
+    console.error('Error fetching victims:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -90,7 +90,7 @@ async function initializeDatabase() {
 }
 
 async function importCSV() {
-  const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
+  const filePath = path.join(__dirname, '../shared/constants/production_data.csv');
   const csvData = [];
 
   fs.createReadStream(filePath).pipe(csv()).on('data', (row) => {
@@ -373,13 +373,37 @@ app.get('/api/victim-stats', async (req, res) => {
 });
 
 app.get('/api/victims', async (req, res) => {
-  try {
-    const [results] = await db.query('SELECT * FROM victim');
-    res.json(results);
-  } catch (error) {
-    console.error('Error fetching victims:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  const [results] = await db.query('SELECT * FROM victim');
+  res.json(results);
+});
+
+app.post('/api/incidents-time', async (req, res) => {
+  const { startTime, endTime } = req.body;
+
+  if (!startTime || !endTime) {
+    return res.status(400).json({ error: 'Start time and end time are required' });
   }
+
+  const query = `
+    SELECT *
+    FROM incident i
+    WHERE Timestamp < ? AND Timestamp > ?;
+  `;
+
+  const [results] = await db.query(query, [endTime, startTime]);
+  res.json(results);
+});
+
+app.get('/api/attack-count', async (req, res) => {
+  const query = `
+    SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
+    FROM incident
+    GROUP BY year
+    ORDER BY year ASC;
+  `;
+
+  const [results] = await db.query(query);
+  res.json(results);
 });
 
 app.listen(port, () => {

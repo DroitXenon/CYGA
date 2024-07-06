@@ -22,7 +22,7 @@ function VictimPage() {
   }, []);
 
   return (
-    <Box className='victim' sx={{ p: 3, flexDirection: 'row', height: '90%' }}>
+    <Box className='victim' sx={{ flexDirection: 'row', height: 'calc(100vh - 160px)' }}>
       <Box sx={{ flex: 3, overflowY: 'auto', height: '100%' }}>
         <Paper>
           <Typography variant="h6" sx={{ p: 2 }}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Typography, Box, Grid } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
 
 function VictimPage() {
   const [deviceInfoStats, setDeviceInfoStats] = useState([]);

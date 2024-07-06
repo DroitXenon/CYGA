@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Box, Button, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, Paper, Grid } from '@mui/material';
+import { Card, Box, Button, Table, TableBody, TableCell, TableHead, TableRow, TextField,} from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LineChart } from '@mui/x-charts/LineChart';
@@ -92,7 +92,6 @@ function TimePage() {
                     ))}
                     </TableBody>
                 </Table>
-                   
             </Card>
         </Box>        
     </Box> 

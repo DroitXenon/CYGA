@@ -1,6 +1,5 @@
 src/App.css
 
-/* General styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -19,4 +18,6 @@ body {
   height: calc(100vh - 100px);
   overflow-y: auto;
 }
+
+
 

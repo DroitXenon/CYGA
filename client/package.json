@@ -8,6 +8,7 @@
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.19",
     "@mui/styled-engine": "^5.15.14",
+    "@mui/x-charts": "^7.9.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

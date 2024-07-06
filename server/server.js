@@ -90,7 +90,7 @@ async function initializeDatabase() {
 }
 
 async function importCSV() {
-  const filePath = path.join(__dirname, '../shared/constants/production_data.csv');
+  const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
   const csvData = [];
 
   fs.createReadStream(filePath).pipe(csv()).on('data', (row) => {
@@ -329,6 +329,28 @@ app.post('/api/update', async (req, res) => {
     res.json({ message: 'Record updated.' });
   } catch (error) {
     console.error('Error updating record:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/api/network-stats', async (req, res) => {
+  try {
+    const [protocolResults] = await db.query(`
+      SELECT Protocol, COUNT(*) as count
+      FROM network_traffic
+      GROUP BY Protocol;
+    `);
+
+    const [trafficTypeResults] = await db.query(`
+      SELECT TrafficType, COUNT(*) as count
+      FROM network_traffic
+      GROUP BY TrafficType;
+    `);
+
+    res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
+  } catch (error) {
+    console.error('Error fetching network stats:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

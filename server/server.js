@@ -324,13 +324,86 @@ app.post('/api/update', async (req, res) => {
 
   try {
     await db.query(query, [column, value, id]);
-    console.log('Record updated.') 
+    console.log('Record updated.') ;
     console.log(column, value, id);
     res.json({ message: 'Record updated.' });
   } catch (error) {
     console.error('Error updating record:', error);
-    res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+
+app.get('/api/network-stats', async (req, res) => {
+  const [protocolResults] = await db.query(`
+    SELECT Protocol, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY Protocol;
+  `);
+
+  const [trafficTypeResults] = await db.query(`
+    SELECT TrafficType, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY TrafficType;
+  `);
+
+  res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
+});
+
+app.get('/api/victim-stats', async (req, res) => {
+  const [deviceInfoResults] = await db.query(`
+    SELECT DeviceInfo, COUNT(*) as count
+    FROM victim
+    GROUP BY DeviceInfo
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  const [geoLocationResults] = await db.query(`
+    SELECT GeoLocation, COUNT(*) as count
+    FROM victim
+    GROUP BY GeoLocation
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  res.json({
+    deviceInfoStats: deviceInfoResults,
+    geoLocationStats: geoLocationResults
+  });
+});
+
+app.get('/api/victims', async (req, res) => {
+  const [results] = await db.query('SELECT * FROM victim');
+  res.json(results);
+});
+
+app.post('/api/incidents-time', async (req, res) => {
+  const { startTime, endTime } = req.body;
+
+  if (!startTime || !endTime) {
+    return res.status(400).json({ error: 'Start time and end time are required' });
+  }
+
+  const query = `
+    SELECT *
+    FROM incident i
+    WHERE Timestamp < ? AND Timestamp > ?;
+  `;
+
+  const [results] = await db.query(query, [endTime, startTime]);
+  res.json(results);
+});
+
+app.get('/api/attack-count', async (req, res) => {
+  const query = `
+    SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
+    FROM incident
+    GROUP BY year
+    ORDER BY year ASC;
+  `;
+
+  const [results] = await db.query(query);
+  res.json(results);
 });
 
 app.listen(port, () => {

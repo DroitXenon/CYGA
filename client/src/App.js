@@ -1,13 +1,18 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { CssBaseline, AppBar, Toolbar, Typography, Button, IconButton, Box, Modal, TextField, Card, CardContent } from '@mui/material';
+import React, { useState } from 'react';
+import { CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, Divider, ListItemButton, ListItemIcon } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import './App.css';
+import MainPage from './components/MainPage';
+import TimePage from './components/TimePage';
+import NetworkPage from './components/NetworkPage';
+import VictimPage from './components/VictimPage';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import IncidentList from './components/IncidentList';
-import IncidentDetails from './components/IncidentDetails';
-import Globe from 'globe.gl';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import './App.css';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import LanIcon from '@mui/icons-material/Lan';
+import PersonIcon from '@mui/icons-material/Person';
 
 const darkTheme = createTheme({
   palette: {
@@ -16,149 +21,28 @@ const darkTheme = createTheme({
 });
 
 function App() {
-  const [selectedIncident, setSelectedIncident] = useState(null);
-  const [incidentData, setIncidentData] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newIncident, setNewIncident] = useState({
-    SourceIP: '',
-    SourcePort: '',
-    SourceLatitude: '',
-    SourceLongitude: '',
-    DestinationIP: '',
-    DestinationPort: '',
-    DestinationLatitude: '',
-    DestinationLongitude: '',
-    UserInfo: '',
-    DeviceInfo: '',
-    GeoLocation: '',
-    Protocol: '',
-    PacketLength: '',
-    PacketType: '',
-    TrafficType: '',
-    Segment: '',
-    AnomalyScores: '',
-    ActionTaken: '',
-    SeverityLevel: '',
-    LogSource: '',
-    AttackType: '',
-    Timestamp: '',
-    AttackSignature: ''
-  });
-  const [selectedIncidentIds, setSelectedIncidentIds] = useState([]);
-
-  const globeEl = useRef();
-  const globeInstance = useRef(null);
-
-  useEffect(() => {
-    globeInstance.current = Globe()
-      (globeEl.current)
-      .width(window.innerWidth * 1.4)
-      .height(window.innerHeightm * 1.4)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
-
-    globeInstance.current.pointOfView({
-      lat: parseFloat(43.466667),
-      lng: parseFloat(-80.516670),
-      altitude: 3
-    }, 1500);
-    fetchIncidents();
-  }, []);
-
-  const fetchIncidents = () => {
-    fetch(`http://localhost:5001/api/incidents`)
-      .then(response => response.json())
-      .then(data => setIncidentData(Array.isArray(data) ? data : []))
-      .catch(error => console.error('Error fetching incident data:', error));
-  };
-
-  const handleIncidentClick = (incident) => {
-    setSelectedIncident(incident);
-    const { SourceLatitude, SourceLongitude, DestinationLatitude, DestinationLongitude } = incident;
-    const arcsData = [
-      {
-        startLat: parseFloat(SourceLatitude),
-        startLng: parseFloat(SourceLongitude),
-        endLat: parseFloat(DestinationLatitude),
-        endLng: parseFloat(DestinationLongitude),
-      }
-    ];
-    globeInstance.current
-      .arcsData(arcsData)
-      .arcColor(() => ['#0252FB', '#C0D3FA'])
-      .arcDashLength(0.5)
-      .arcDashGap(0.5)
-      .arcDashInitialGap(() => Math.random())
-      .arcStroke(() => 0.7)
-      .arcDashAnimateTime(1500);
-    globeInstance.current.pointOfView({
-      lat: parseFloat(DestinationLatitude),
-      lng: parseFloat(DestinationLongitude),
-      altitude: 2
-    }, 2000);
-  };
-
-  const handleBackClick = () => {
-    setSelectedIncident(null);
-    globeInstance.current.arcsData([]);
-    globeInstance.current.pointOfView({
-      lat: parseFloat(43.466667),
-      lng: parseFloat(-80.516670),
-      altitude: 3
-    }, 2000);
-  };
-
-  const handleSort = (column, order) => {
-    fetch(`http://localhost:5001/api/sort?column=${column}&order=${order}`)
-      .then(response => response.json())
-      .then(data => setIncidentData(Array.isArray(data) ? data : []))
-      .catch(error => console.error('Error sorting incident data:', error));
-  };
-
-  const handleAddIncident = () => {
-    fetch(`http://localhost:5001/api/add`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIncident)
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Incident added:', data);
-        fetchIncidents();
-        setIsAddModalOpen(false);
-      })
-      .catch(error => console.error('Error adding incident:', error));
-  };
-
-  const handleDeleteIncidents = () => {
-    selectedIncidentIds.forEach(id => {
-      fetch(`http://localhost:5001/api/delete/${id}`, {
-        method: 'DELETE'
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Incident deleted:', data);
-          fetchIncidents();
-        })
-        .catch(error => console.error('Error deleting incident:', error));
-    });
-    setSelectedIncidentIds([]);
-  };
-
-  const handleSelectIncident = (id) => {
-    setSelectedIncidentIds(prevSelected =>
-      prevSelected.includes(id) ? prevSelected.filter(selectedId => selectedId !== id) : [...prevSelected, id]
-    );
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewIncident({ ...newIncident, [name]: value });
-  };
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [page, setPage] = useState('main');
 
   const handleGithub = () => {
     window.open('https://github.com/DroitXenon/CYGA', '_blank');
+  };
+
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    setDrawerOpen(false);
+  };
+
+  const handleBackClick = () => {
+    if (page === 'main' && typeof window.handleMainPageBackClick === 'function') {
+      window.handleMainPageBackClick();
+    } else {
+      setPage('main');
+    }
   };
 
   return (
@@ -167,14 +51,14 @@ function App() {
       <div className="app">
         <AppBar position="sticky">
           <Toolbar>
-            <IconButton edge="start" color="inherit" aria-label="menu">
+            <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>
             <IconButton color="inherit" onClick={handleBackClick} sx={{ mr: 2 }}>
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              CYGA Dashboard
+              Cyber Geolocation Analysis
             </Typography>
             <IconButton color="inherit" onClick={handleGithub}>
               <GitHubIcon />
@@ -182,64 +66,51 @@ function App() {
           </Toolbar>
         </AppBar>
 
-        <div ref={globeEl}></div>
-
-        <Card sx={{ position: 'absolute', top: 100, left: 50, width: '40%', height: 'calc(100vh - 150px)' }}>
-          <CardContent>
-            <Box className="table-container">
-              {selectedIncident ? (
-                <IncidentDetails incident={selectedIncident} />
-              ) : (
-                <IncidentList 
-                  incidents={incidentData} 
-                  onIncidentClick={handleIncidentClick} 
-                  onSort={handleSort} 
-                  onSelectIncident={handleSelectIncident} 
-                  selectedIncidentIds={selectedIncidentIds} 
-                  fetchIncidents={fetchIncidents}
-                  setIncidentData={setIncidentData}
-                  handleAddIncident={() => setIsAddModalOpen(true)}
-                  handleDeleteIncidents={handleDeleteIncidents}
-                />
-              )}
-            </Box>
-          </CardContent>
-        </Card>
-
-        <Modal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-          <Box
-            sx={{
-              p: 3,
-              mx: 'auto',
-              mt: 5,
-              maxWidth: 500,
-              maxHeight: '80vh',
-              overflow: 'auto',
-              bgcolor: 'background.paper',
-              boxShadow: 24,
-              borderRadius: 2,
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Add
-            </Typography>
-            {Object.keys(newIncident).map((field) => (
-              <TextField
-                key={field}
-                label={field}
-                name={field}
-                value={newIncident[field]}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-              />
-            ))}
-            <Button variant="contained" color="primary" onClick={handleAddIncident} sx={{ mt: 2 }}>
-              Add Incident
-            </Button>
-          </Box>
-        </Modal>
-
+        <Drawer
+          open={drawerOpen}
+          onClose={toggleDrawer(false)}
+          anchor="left"
+        >
+          <List>
+            <ListItem disablePadding onClick={() => handlePageChange('main')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <FormatListBulletedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Attacks" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding onClick={() => handlePageChange('time')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <TimelineIcon />
+                </ListItemIcon>
+                <ListItemText primary="Time" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding onClick={() => handlePageChange('network')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <LanIcon />
+                </ListItemIcon>
+                <ListItemText primary="Network" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding onClick={() => handlePageChange('victim')}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Victim" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <Divider />
+        </Drawer>
+        {page === 'main' && <MainPage />}
+        {page === 'time' && <TimePage />}
+        {page === 'network' && <NetworkPage />}
+        {page === 'victim' && <VictimPage />}
       </div>
     </ThemeProvider>
   );

@@ -22,7 +22,7 @@ WHERE i.AttackType LIKE '%Malware%'
     OR i.Timestamp LIKE '2024-06-01 06:33:58';
     -- (Here '' is a place holder, user can change to other words to search)
 
--- Sort 
+-- 1. Sort 
 SELECT *
 FROM incident i
 JOIN response r ON i.responseId = r.id

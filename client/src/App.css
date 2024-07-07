@@ -1,6 +1,5 @@
 src/App.css
 
-/* General styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -18,5 +17,20 @@ body {
 .table-container {
   height: calc(100vh - 100px);
   overflow-y: auto;
+}
+
+.network {
+  margin: 50px;
+  display: flex;
+}
+
+.victim {
+  margin: 50px;
+  display: flex;
+}
+
+.time {
+  margin: 50px;
+  display: flex;
 }
 

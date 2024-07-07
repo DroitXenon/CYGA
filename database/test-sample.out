@@ -29,6 +29,7 @@ mysql> SELECT * FROM victim
 
 mysql> SELECT * FROM network_traffic
     -> LIMIT 5;
+
 +----+----------+--------------+------------+-------------+-----------+----------+
 | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
 +----+----------+--------------+------------+-------------+-----------+----------+

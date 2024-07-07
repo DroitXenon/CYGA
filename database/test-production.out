@@ -1,107 +1,15 @@
 -- File for C3 (Output Part)
 
--- Show all the data (Not a feature)
-mysql> SELECT * FROM attacker
-    -> LIMIT 10;
-+----+-----------------+------------+----------------+-----------------+
-| id | SourceIP        | SourcePort | SourceLatitude | SourceLongitude |
-+----+-----------------+------------+----------------+-----------------+
-|  1 | 196.71.113.100  |      57422 | 40.42          | -3.7            |
-|  2 | 64.111.165.5    |      16795 | -33.87         | 151.21          |
-|  3 | 82.74.123.1     |       1860 | 22.31          | 114.16          |
-|  4 | 129.92.145.199  |      39158 | 37.57          | 126.98          |
-|  5 | 182.201.145.186 |      63570 | 1.35           | 103.82          |
-|  6 | 212.167.234.113 |      55343 | 35.68          | 139.76          |
-|  7 | 62.215.236.159  |      45732 | 40.71          | -74.01          |
-|  8 | 210.163.158.40  |      12284 | 50.08          | 14.44           |
-|  9 | 109.76.165.29   |      55886 | 41.38          | 2.17            |
-| 10 | 71.49.248.51    |       7265 | 41.38          | 2.17            |
-+----+-----------------+------------+----------------+-----------------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM victim
-    -> LIMIT 10;
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+
-| id | DestinationIP  | DestinationPort | DestinationLatitude | DestinationLongitude | UserInfo        | DeviceInfo                                                                                                                                         | GeoLocation             | attackerId |
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+
-|  1 | 82.48.172.177  |            2685 | -33.93              | 18.42                | Cynthia Dickson | Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_9 rv:5.0; hne-IN) AppleWebKit/535.28.7 (KHTML, like Gecko) Version/4.1 Safari/535.28.7                 | Cape Town, South Africa |          1 |
-|  2 | 72.101.67.8    |            1769 | 60.17               | 24.94                | Sara Johnston   | Mozilla/5.0 (Windows NT 5.01; km-KH; rv:1.9.0.20) Gecko/2014-06-07 03:37:33 Firefox/3.6.7                                                          | Helsinki, Finland       |          2 |
-|  3 | 20.111.149.50  |           60735 | 37.57               | 126.98               | Morgan Powers   | Mozilla/5.0 (iPod; U; CPU iPhone OS 3_0 like Mac OS X; sv-FI) AppleWebKit/534.22.3 (KHTML, like Gecko) Version/3.0.5 Mobile/8B116 Safari/6534.22.3 | Seoul, South Korea      |          3 |
-|  4 | 54.208.193.4   |           63955 | 52.52               | 13.41                | David Pineda    | Mozilla/5.0 (compatible; MSIE 5.0; Windows 98; Win 9x 4.90; Trident/4.1)                                                                           | Berlin, Germany         |          4 |
-|  5 | 139.88.7.91    |           57101 | -27.47              | 153.03               | Paula Thomas    | Mozilla/5.0 (Windows; U; Windows NT 5.0) AppleWebKit/533.43.1 (KHTML, like Gecko) Version/5.0.1 Safari/533.43.1                                    | Brisbane, Australia     |          5 |
-|  6 | 29.181.237.203 |            3433 | 47.5                | 19.04                | John Rivas      | Mozilla/5.0 (compatible; MSIE 7.0; Windows 95; Trident/3.0)                                                                                        | Budapest, Hungary       |          6 |
-|  7 | 156.93.242.100 |            6311 | 41.01               | 28.98                | Joseph Abbott   | Mozilla/5.0 (compatible; MSIE 9.0; Windows 95; Trident/4.0)                                                                                        | Istanbul, Turkey        |          7 |
-|  8 | 108.208.17.201 |           38819 | 23.11               | -82.37               | Mary Johnson    | Mozilla/5.0 (Android 4.3.1; Mobile; rv:10.0) Gecko/10.0 Firefox/10.0                                                                               | Havana, Cuba            |          8 |
-|  9 | 45.15.128.243  |           40188 | 40.71               | -74.01               | Heather Gregory | Opera/9.19.(Windows NT 10.0; bg-BG) Presto/2.9.172 Version/10.00                                                                                   | New York, USA           |          9 |
-| 10 | 56.196.106.196 |           18568 | 55.68               | 12.57                | Kenneth Wyatt   | Mozilla/5.0 (Linux; Android 4.0.4) AppleWebKit/534.2 (KHTML, like Gecko) Chrome/15.0.821.0 Safari/534.2                                            | Copenhagen, Denmark     |         10 |
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM network_traffic
-    -> LIMIT 10;
-+----+----------+--------------+------------+-------------+-----------+----------+
-| id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
-+----+----------+--------------+------------+-------------+-----------+----------+
-|  1 | ICMP     |          840 | Control    | HTTP        | Segment A |        1 |
-|  2 | UDP      |         1433 | Control    | DNS         | Segment A |        2 |
-|  3 | UDP      |          628 | Control    | FTP         | Segment A |        3 |
-|  4 | ICMP     |          961 | Control    | HTTP        | Segment A |        4 |
-|  5 | UDP      |         1427 | Control    | DNS         | Segment C |        5 |
-|  6 | ICMP     |          155 | Control    | HTTP        | Segment A |        6 |
-|  7 | ICMP     |         1454 | Control    | HTTP        | Segment B |        7 |
-|  8 | TCP      |         1019 | Control    | HTTP        | Segment B |        8 |
-|  9 | ICMP     |          572 | Data       | HTTP        | Segment B |        9 |
-| 10 | TCP      |          839 | Control    | FTP         | Segment C |       10 |
-+----+----------+--------------+------------+-------------+-----------+----------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM response
-    -> LIMIT 10;
-+----+---------------+-------------+---------------+-----------+------------------+
-| id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId |
-+----+---------------+-------------+---------------+-----------+------------------+
-|  1 | 59.79393669   | Logged      | Medium        | Firewall  |                1 |
-|  2 | 65.31228784   | Blocked     | High          | Server    |                2 |
-|  3 | 52.41719823   | Blocked     | Low           | Server    |                3 |
-|  4 | 74.8410615    | Blocked     | Medium        | Firewall  |                4 |
-|  5 | 55.57539179   | Ignored     | Low           | Server    |                5 |
-|  6 | 74.04717729   | Blocked     | Low           | Server    |                6 |
-|  7 | 69.50270045   | Ignored     | High          | Server    |                7 |
-|  8 | 41.46154719   | Logged      | Medium        | Firewall  |                8 |
-|  9 | 16.67870815   | Ignored     | High          | Firewall  |                9 |
-| 10 | 35.95727765   | Blocked     | High          | Server    |               10 |
-+----+---------------+-------------+---------------+-----------+------------------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM incident
-    -> LIMIT 10;
-+----+------------+-----------------+-----------------+------------+
-| id | AttackType | Timestamp       | AttackSignature | responseId |
-+----+------------+-----------------+-----------------+------------+
-|  1 | DDoS       | 2022/1/8 12:20  | Known Pattern A |          1 |
-|  2 | Malware    | 2022/9/19 22:10 | Known Pattern A |          2 |
-|  3 | Malware    | 2020/10/30 3:00 | Known Pattern A |          3 |
-|  4 | Malware    | 2022/4/11 14:36 | Known Pattern A |          4 |
-|  5 | Malware    | 2020/5/14 14:48 | Known Pattern A |          5 |
-|  6 | Malware    | 2020/11/17 5:56 | Known Pattern A |          6 |
-|  7 | DDoS       | 2023/2/4 13:05  | Known Pattern A |          7 |
-|  8 | DDoS       | 2021/3/8 20:13  | Known Pattern B |          8 |
-|  9 | DDoS       | 2022/8/27 10:28 | Known Pattern A |          9 |
-| 10 | Malware    | 2020/4/13 1:02  | Known Pattern B |         10 |
-+----+------------+-----------------+-----------------+------------+
-10 rows in set (0.00 sec)
-
-There are five features:
--- 1.Search 
-
+-- 1. Filter
+-- Search 
 mysql> SELECT *
     -> FROM incident i
     -> JOIN response r ON i.responseId = r.id
     -> JOIN network_traffic n ON r.networkTrafficId = n.id
     -> JOIN victim v ON n.victimId = v.id
     -> JOIN attacker a ON v.attackerId = a.id
-    -> WHERE i.AttackType LIKE '%Malware%'
-    ->     OR i.AttackSignature LIKE '%Known Pattern B%'
+    -> WHERE i.AttackType LIKE '%Malware%' 
+    ->     OR i.AttackSignature LIKE '%Known Pattern B%' 
     ->     OR i.Timestamp LIKE '2024-06-01 06:33:58'
     -> LIMIT 10;
 +----+------------+-----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+----------------+-----------------+---------------------+----------------------+----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+------------+----+-----------------+------------+----------------+-----------------+
@@ -120,31 +28,7 @@ mysql> SELECT *
 +----+------------+-----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+----------------+-----------------+---------------------+----------------------+----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+------------+----+-----------------+------------+----------------+-----------------+
 10 rows in set (0.00 sec)
 
--- 2.Add
-mysql> INSERT INTO attacker (SourceIP, SourcePort, SourceLatitude, SourceLongitude)
-    -> VALUES ('192.168.0.2', 5000, 39.90, 116.27);
-Query OK, 1 row affected (0.01 sec)
-
-mysql> SELECT * FROM attacker
-    -> LIMIT 10;
-+----+-----------------+------------+----------------+-----------------+
-| id | SourceIP        | SourcePort | SourceLatitude | SourceLongitude |
-+----+-----------------+------------+----------------+-----------------+
-|  1 | 196.71.113.100  |      57422 | 40.42          | -3.7            |
-|  2 | 64.111.165.5    |      16795 | -33.87         | 151.21          |
-|  3 | 82.74.123.1     |       1860 | 22.31          | 114.16          |
-|  4 | 129.92.145.199  |      39158 | 37.57          | 126.98          |
-|  5 | 182.201.145.186 |      63570 | 1.35           | 103.82          |
-|  6 | 212.167.234.113 |      55343 | 35.68          | 139.76          |
-|  7 | 62.215.236.159  |      45732 | 40.71          | -74.01          |
-|  8 | 210.163.158.40  |      12284 | 50.08          | 14.44           |
-|  9 | 109.76.165.29   |      55886 | 41.38          | 2.17            |
-| 10 | 71.49.248.51    |       7265 | 41.38          | 2.17            |
-+----+-----------------+------------+----------------+-----------------+
-10 rows in set (0.01 sec)
-
--- 3. Sort
-
+-- Sort 
 mysql> SELECT *
     -> FROM incident i
     -> JOIN response r ON i.responseId = r.id
@@ -169,108 +53,35 @@ mysql> SELECT *
 +-----+------------+-----------------+-----------------+------------+-----+---------------+-------------+---------------+-----------+------------------+-----+----------+--------------+------------+-------------+-----------+----------+-----+---------------+-----------------+---------------------+----------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+------------+-----+-------------+------------+----------------+-----------------+
 10 rows in set (0.00 sec)
 
--- 4. Delete
-mysql> DELETE i, r, n, v, a
+-- 2. View
+mysql> CREATE VIEW view_table AS
+    -> SELECT AttackType,SeverityLevel
     -> FROM incident i
     -> JOIN response r ON i.responseId = r.id
     -> JOIN network_traffic n ON r.networkTrafficId = n.id
     -> JOIN victim v ON n.victimId = v.id
     -> JOIN attacker a ON v.attackerId = a.id
-    -> WHERE i.id = 1;
-Query OK, 5 rows affected (0.01 sec)
-
-mysql> SELECT * FROM attacker
     -> LIMIT 10;
-+----+-----------------+------------+----------------+-----------------+
-| id | SourceIP        | SourcePort | SourceLatitude | SourceLongitude |
-+----+-----------------+------------+----------------+-----------------+
-|  2 | 64.111.165.5    |      16795 | -33.87         | 151.21          |
-|  3 | 82.74.123.1     |       1860 | 22.31          | 114.16          |
-|  4 | 129.92.145.199  |      39158 | 37.57          | 126.98          |
-|  5 | 182.201.145.186 |      63570 | 1.35           | 103.82          |
-|  6 | 212.167.234.113 |      55343 | 35.68          | 139.76          |
-|  7 | 62.215.236.159  |      45732 | 40.71          | -74.01          |
-|  8 | 210.163.158.40  |      12284 | 50.08          | 14.44           |
-|  9 | 109.76.165.29   |      55886 | 41.38          | 2.17            |
-| 10 | 71.49.248.51    |       7265 | 41.38          | 2.17            |
-| 11 | 28.246.129.51   |      17850 | 52.52          | 13.41           |
-+----+-----------------+------------+----------------+-----------------+
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM view_table;
++------------+---------------+
+| AttackType | SeverityLevel |
++------------+---------------+
+| DDoS       | Medium        |
+| Malware    | High          |
+| Malware    | Low           |
+| Malware    | Medium        |
+| Malware    | Low           |
+| Malware    | Low           |
+| DDoS       | High          |
+| DDoS       | Medium        |
+| DDoS       | High          |
+| Malware    | High          |
++------------+---------------+
 10 rows in set (0.00 sec)
 
-mysql> SELECT * FROM victim
-    -> LIMIT 10;
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+------------+
-| id | DestinationIP  | DestinationPort | DestinationLatitude | DestinationLongitude | UserInfo        | DeviceInfo                                                                                                                                         | GeoLocation         | attackerId |
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+------------+
-|  2 | 72.101.67.8    |            1769 | 60.17               | 24.94                | Sara Johnston   | Mozilla/5.0 (Windows NT 5.01; km-KH; rv:1.9.0.20) Gecko/2014-06-07 03:37:33 Firefox/3.6.7                                                          | Helsinki, Finland   |          2 |
-|  3 | 20.111.149.50  |           60735 | 37.57               | 126.98               | Morgan Powers   | Mozilla/5.0 (iPod; U; CPU iPhone OS 3_0 like Mac OS X; sv-FI) AppleWebKit/534.22.3 (KHTML, like Gecko) Version/3.0.5 Mobile/8B116 Safari/6534.22.3 | Seoul, South Korea  |          3 |
-|  4 | 54.208.193.4   |           63955 | 52.52               | 13.41                | David Pineda    | Mozilla/5.0 (compatible; MSIE 5.0; Windows 98; Win 9x 4.90; Trident/4.1)                                                                           | Berlin, Germany     |          4 |
-|  5 | 139.88.7.91    |           57101 | -27.47              | 153.03               | Paula Thomas    | Mozilla/5.0 (Windows; U; Windows NT 5.0) AppleWebKit/533.43.1 (KHTML, like Gecko) Version/5.0.1 Safari/533.43.1                                    | Brisbane, Australia |          5 |
-|  6 | 29.181.237.203 |            3433 | 47.5                | 19.04                | John Rivas      | Mozilla/5.0 (compatible; MSIE 7.0; Windows 95; Trident/3.0)                                                                                        | Budapest, Hungary   |          6 |
-|  7 | 156.93.242.100 |            6311 | 41.01               | 28.98                | Joseph Abbott   | Mozilla/5.0 (compatible; MSIE 9.0; Windows 95; Trident/4.0)                                                                                        | Istanbul, Turkey    |          7 |
-|  8 | 108.208.17.201 |           38819 | 23.11               | -82.37               | Mary Johnson    | Mozilla/5.0 (Android 4.3.1; Mobile; rv:10.0) Gecko/10.0 Firefox/10.0                                                                               | Havana, Cuba        |          8 |
-|  9 | 45.15.128.243  |           40188 | 40.71               | -74.01               | Heather Gregory | Opera/9.19.(Windows NT 10.0; bg-BG) Presto/2.9.172 Version/10.00                                                                                   | New York, USA       |          9 |
-| 10 | 56.196.106.196 |           18568 | 55.68               | 12.57                | Kenneth Wyatt   | Mozilla/5.0 (Linux; Android 4.0.4) AppleWebKit/534.2 (KHTML, like Gecko) Chrome/15.0.821.0 Safari/534.2                                            | Copenhagen, Denmark |         10 |
-| 11 | 215.210.61.23  |           54707 | -12.04              | -77.03               | Kenneth Nelson  | Opera/8.52.(X11; Linux x86_64; gez-ER) Presto/2.9.173 Version/10.00                                                                                | Lima, Peru          |         11 |
-+----+----------------+-----------------+---------------------+----------------------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------+---------------------+------------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM network_traffic
-    -> LIMIT 10;
-+----+----------+--------------+------------+-------------+-----------+----------+
-| id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId |
-+----+----------+--------------+------------+-------------+-----------+----------+
-|  2 | UDP      |         1433 | Control    | DNS         | Segment A |        2 |
-|  3 | UDP      |          628 | Control    | FTP         | Segment A |        3 |
-|  4 | ICMP     |          961 | Control    | HTTP        | Segment A |        4 |
-|  5 | UDP      |         1427 | Control    | DNS         | Segment C |        5 |
-|  6 | ICMP     |          155 | Control    | HTTP        | Segment A |        6 |
-|  7 | ICMP     |         1454 | Control    | HTTP        | Segment B |        7 |
-|  8 | TCP      |         1019 | Control    | HTTP        | Segment B |        8 |
-|  9 | ICMP     |          572 | Data       | HTTP        | Segment B |        9 |
-| 10 | TCP      |          839 | Control    | FTP         | Segment C |       10 |
-| 11 | ICMP     |           98 | Data       | HTTP        | Segment A |       11 |
-+----+----------+--------------+------------+-------------+-----------+----------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM response
-    -> LIMIT 10;
-+----+---------------+-------------+---------------+-----------+------------------+
-| id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId |
-+----+---------------+-------------+---------------+-----------+------------------+
-|  2 | 65.31228784   | Blocked     | High          | Server    |                2 |
-|  3 | 52.41719823   | Blocked     | Low           | Server    |                3 |
-|  4 | 74.8410615    | Blocked     | Medium        | Firewall  |                4 |
-|  5 | 55.57539179   | Ignored     | Low           | Server    |                5 |
-|  6 | 74.04717729   | Blocked     | Low           | Server    |                6 |
-|  7 | 69.50270045   | Ignored     | High          | Server    |                7 |
-|  8 | 41.46154719   | Logged      | Medium        | Firewall  |                8 |
-|  9 | 16.67870815   | Ignored     | High          | Firewall  |                9 |
-| 10 | 35.95727765   | Blocked     | High          | Server    |               10 |
-| 11 | 56.81888769   | Logged      | Medium        | Firewall  |               11 |
-+----+---------------+-------------+---------------+-----------+------------------+
-10 rows in set (0.00 sec)
-
-mysql> SELECT * FROM incident
-    -> LIMIT 10;
-+----+------------+-----------------+-----------------+------------+
-| id | AttackType | Timestamp       | AttackSignature | responseId |
-+----+------------+-----------------+-----------------+------------+
-|  2 | Malware    | 2022/9/19 22:10 | Known Pattern A |          2 |
-|  3 | Malware    | 2020/10/30 3:00 | Known Pattern A |          3 |
-|  4 | Malware    | 2022/4/11 14:36 | Known Pattern A |          4 |
-|  5 | Malware    | 2020/5/14 14:48 | Known Pattern A |          5 |
-|  6 | Malware    | 2020/11/17 5:56 | Known Pattern A |          6 |
-|  7 | DDoS       | 2023/2/4 13:05  | Known Pattern A |          7 |
-|  8 | DDoS       | 2021/3/8 20:13  | Known Pattern B |          8 |
-|  9 | DDoS       | 2022/8/27 10:28 | Known Pattern A |          9 |
-| 10 | Malware    | 2020/4/13 1:02  | Known Pattern B |         10 |
-| 11 | Malware    | 2020/6/11 3:49  | Known Pattern A |         11 |
-+----+------------+-----------------+-----------------+------------+
-10 rows in set (0.01 sec)
-
-
--- 5. Analysis
+-- 3. Analysis
 mysql> SELECT *,
     -> CASE
     ->     WHEN n.PacketLength < 500 THEN 'Low'
@@ -282,68 +93,108 @@ mysql> SELECT *,
     -> JOIN network_traffic n ON r.networkTrafficId = n.id
     -> JOIN victim v ON n.victimId = v.id
     -> JOIN attacker a ON v.attackerId = a.id
-    -> WHERE i.id = 2;
-+----+------------+-----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+---------------+-------------------------------------------------------------------------------------------+-------------------+------------+----+--------------+------------+----------------+-----------------+-------------+
-| id | AttackType | Timestamp       | AttackSignature | responseId | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId | id | DestinationIP | DestinationPort | DestinationLatitude | DestinationLongitude | UserInfo      | DeviceInfo                                                                                | GeoLocation       | attackerId | id | SourceIP     | SourcePort | SourceLatitude | SourceLongitude | ReportLevel |
-+----+------------+-----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+---------------+-------------------------------------------------------------------------------------------+-------------------+------------+----+--------------+------------+----------------+-----------------+-------------+
-|  2 | Malware    | 2022/9/19 22:10 | Known Pattern A |          2 |  2 | 65.31228784   | Blocked     | High          | Server    |                2 |  2 | UDP      |         1433 | Control    | DNS         | Segment A |        2 |  2 | 72.101.67.8   |            1769 | 60.17               | 24.94                | Sara Johnston | Mozilla/5.0 (Windows NT 5.01; km-KH; rv:1.9.0.20) Gecko/2014-06-07 03:37:33 Firefox/3.6.7 | Helsinki, Finland |          2 |  2 | 64.111.165.5 |      16795 | -33.87         | 151.21          | High        |
-+----+------------+-----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+---------------+-------------------------------------------------------------------------------------------+-------------------+------------+----+--------------+------------+----------------+-----------------+-------------+
+    -> WHERE i.id = 1;
++----+------------+----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+-----------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+----+----------------+------------+----------------+-----------------+-------------+
+| id | AttackType | Timestamp      | AttackSignature | responseId | id | AnomalyScores | ActionTaken | SeverityLevel | LogSource | networkTrafficId | id | Protocol | PacketLength | PacketType | TrafficType | Segment   | victimId | id | DestinationIP | DestinationPort | DestinationLatitude | DestinationLongitude | UserInfo        | DeviceInfo                                                                                                                         | GeoLocation             | attackerId | id | SourceIP       | SourcePort | SourceLatitude | SourceLongitude | ReportLevel |
++----+------------+----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+-----------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+----+----------------+------------+----------------+-----------------+-------------+
+|  1 | DDoS       | 2022/1/8 12:20 | Known Pattern A |          1 |  1 | 59.79393669   | Logged      | Medium        | Firewall  |                1 |  1 | ICMP     |          840 | Control    | HTTP        | Segment A |        1 |  1 | 82.48.172.177 |            2685 | -33.93              | 18.42                | Cynthia Dickson | Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_9 rv:5.0; hne-IN) AppleWebKit/535.28.7 (KHTML, like Gecko) Version/4.1 Safari/535.28.7 | Cape Town, South Africa |          1 |  1 | 196.71.113.100 |      57422 | 40.42          | -3.7            | Medium      |
++----+------------+----------------+-----------------+------------+----+---------------+-------------+---------------+-----------+------------------+----+----------+--------------+------------+-------------+-----------+----------+----+---------------+-----------------+---------------------+----------------------+-----------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------+------------+----+----------------+------------+----------------+-----------------+-------------+
 1 row in set (0.00 sec)
 
--- 6. Edit
-mysql> UPDATE incident i
-    -> JOIN response r ON i.responseId = r.id
-    -> JOIN network_traffic n ON r.networkTrafficId = n.id
-    -> JOIN victim v ON n.victimId = v.id
-    -> JOIN attacker a ON v.attackerId = a.id
-    -> SET i.AttackType = 'Malware'
-    -> WHERE i.id = 2;
-Query OK, 1 row affected (0.01 sec)
-
-mysql> select * from incident
-    -> LIMIT 10;
-+----+------------+-----------------+-----------------+------------+
-| id | AttackType | Timestamp       | AttackSignature | responseId |
-+----+------------+-----------------+-----------------+------------+
-|  2 | Malware    | 2022/9/19 22:10 | Known Pattern A |          2 |
-|  3 | Malware    | 2020/10/30 3:00 | Known Pattern A |          3 |
-|  4 | Malware    | 2022/4/11 14:36 | Known Pattern A |          4 |
-|  5 | Malware    | 2020/5/14 14:48 | Known Pattern A |          5 |
-|  6 | Malware    | 2020/11/17 5:56 | Known Pattern A |          6 |
-|  7 | DDoS       | 2023/2/4 13:05  | Known Pattern A |          7 |
-|  8 | DDoS       | 2021/3/8 20:13  | Known Pattern B |          8 |
-|  9 | DDoS       | 2022/8/27 10:28 | Known Pattern A |          9 |
-| 10 | Malware    | 2020/4/13 1:02  | Known Pattern B |         10 |
-| 11 | Malware    | 2020/6/11 3:49  | Known Pattern A |         11 |
-+----+------------+-----------------+-----------------+------------+
-10 rows in set (0.00 sec)
-
-
--- 7. View
-mysql> CREATE VIEW view_table AS
-    -> SELECT AttackType,SeverityLevel
+-- 4. Timestamp
+mysql> SELECT *
     -> FROM incident i
-    -> JOIN response r ON i.responseId = r.id
-    -> JOIN network_traffic n ON r.networkTrafficId = n.id
-    -> JOIN victim v ON n.victimId = v.id
-    -> JOIN attacker a ON v.attackerId = a.id
+    -> WHERE Timestamp < '2021/3/8 20:13'
+    ->     AND Timestamp > '2020/9/7 4:50'
     -> LIMIT 10;
-Query OK, 0 rows affected (0.01 sec)
-
-mysql> SELECT * FROM view_table
-    -> LIMIT 10;
-+------------+---------------+
-| AttackType | SeverityLevel |
-+------------+---------------+
-| Malware    | High          |
-| Malware    | Low           |
-| Malware    | Medium        |
-| Malware    | Low           |
-| Malware    | Low           |
-| DDoS       | High          |
-| DDoS       | Medium        |
-| DDoS       | High          |
-| Malware    | High          |
-| Malware    | Medium        |
-+------------+---------------+
++-----+------------+------------------+-----------------+------------+
+| id  | AttackType | Timestamp        | AttackSignature | responseId |
++-----+------------+------------------+-----------------+------------+
+|  19 | DDoS       | 2021/1/26 16:06  | Known Pattern B |         19 |
+|  20 | DDoS       | 2021/2/21 21:14  | Known Pattern A |         20 |
+|  26 | DDoS       | 2021/10/5 3:32   | Unknown         |         26 |
+|  49 | DDoS       | 2021/12/3 4:46   | Known Pattern B |         49 |
+|  69 | DDoS       | 2021/11/11 21:00 | Known Pattern A |         69 |
+|  78 | DDoS       | 2021/12/14 9:31  | Known Pattern A |         78 |
+|  96 | Malware    | 2021/10/28 2:16  | Known Pattern B |         96 |
+|  97 | None       | 2021/10/16 11:31 | Unknown         |         97 |
+| 141 | None       | 2021/11/7 21:01  | Unknown         |        141 |
+| 153 | None       | 2021/10/13 16:12 | Unknown         |        153 |
++-----+------------+------------------+-----------------+------------+
 10 rows in set (0.01 sec)
+
+mysql> SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
+    -> FROM incident
+    -> GROUP BY year
+    -> ORDER BY year ASC;
++------+-------------+
+| year | attackCount |
++------+-------------+
+| 2020 |         136 |
+| 2021 |         172 |
+| 2022 |         305 |
+| 2023 |         273 |
+| 2024 |         114 |
++------+-------------+
+5 rows in set, 1005 warnings (0.01 sec)
+
+-- 5. NetWork
+-- Summary Protocol attribute
+mysql> SELECT Protocol, COUNT(*) as count
+    -> FROM network_traffic
+    -> GROUP BY Protocol;
++----------+-------+
+| Protocol | count |
++----------+-------+
+| ICMP     |   364 |
+| UDP      |   320 |
+| TCP      |   316 |
++----------+-------+
+3 rows in set (0.00 sec)
+
+-- Summary TrafficType attribute
+mysql> SELECT TrafficType, COUNT(*) as count
+    -> FROM network_traffic
+    -> GROUP BY TrafficType;
++-------------+-------+
+| TrafficType | count |
++-------------+-------+
+| HTTP        |   204 |
+| DNS         |    34 |
+| FTP         |   102 |
+| Data        |   273 |
+| VoIP        |   166 |
+| Video       |   221 |
++-------------+-------+
+6 rows in set (0.00 sec)
+
+-- 6. Victim
+-- Find the top three devices used for cyber attacks 
+mysql> SELECT DeviceInfo, COUNT(*) as count
+    -> FROM victim
+    -> GROUP BY DeviceInfo
+    -> ORDER BY count DESC
+    -> LIMIT 3;
++------------------------------------------------------------------------------------------------------------------------------------+-------+
+| DeviceInfo                                                                                                                         | count |
++------------------------------------------------------------------------------------------------------------------------------------+-------+
+| Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 10.0; Trident/5.0)                                                                   |    18 |
+| Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_9 rv:5.0; hne-IN) AppleWebKit/535.28.7 (KHTML, like Gecko) Version/4.1 Safari/535.28.7 |    17 |
+| Mozilla/5.0 (Windows NT 5.01; km-KH; rv:1.9.0.20) Gecko/2014-06-07 03:37:33 Firefox/3.6.7                                          |    17 |
++------------------------------------------------------------------------------------------------------------------------------------+-------+
+3 rows in set (0.00 sec)
+
+-- Find top three location with the most attacks
+mysql> SELECT GeoLocation, COUNT(*) as count
+    -> FROM victim
+    -> GROUP BY GeoLocation
+    -> ORDER BY count DESC
+    -> LIMIT 3;
++-------------------------+-------+
+| GeoLocation             | count |
++-------------------------+-------+
+| Cape Town, South Africa |    21 |
+| Helsinki, Finland       |    21 |
+| Seoul, South Korea      |    21 |
++-------------------------+-------+
+3 rows in set (0.00 sec)

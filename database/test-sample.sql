@@ -32,7 +32,17 @@ JOIN attacker a ON v.attackerId = a.id
 ORDER BY i.Timestamp ASC; 
     -- (Can change the atrribute and order user want to re-order)
 
--- 2. Analysis
+-- 2. View
+CREATE VIEW view_table AS
+SELECT AttackType,SeverityLevel
+FROM incident i
+JOIN response r ON i.responseId = r.id
+JOIN network_traffic n ON r.networkTrafficId = n.id
+JOIN victim v ON n.victimId = v.id
+JOIN attacker a ON v.attackerId = a.id;
+    --(Can change {AttackType,SeverityLevel} to the attributes column user want)
+
+-- 3. Analysis
 SELECT *,
 CASE
     WHEN n.PacketLength < 500 THEN 'Low'
@@ -47,21 +57,18 @@ JOIN attacker a ON v.attackerId = a.id
 WHERE i.id = 1;
     --(Can change 2 to the IID user want)
 
--- 3. View
-CREATE VIEW view_table AS
-SELECT AttackType,SeverityLevel
-FROM incident i
-JOIN response r ON i.responseId = r.id
-JOIN network_traffic n ON r.networkTrafficId = n.id
-JOIN victim v ON n.victimId = v.id
-JOIN attacker a ON v.attackerId = a.id;
-    --(Can change {AttackType,SeverityLevel} to the attributes column user want)
-
 -- 4. Timestamp
+-- Show the cybersecurity attacks within the given time
 SELECT *
 FROM incident i
 WHERE Timestamp < '2021/3/8 20:13'
     AND Timestamp > '2020/9/7 4:50';
+
+-- Counting the total number of cybersecurity attacks in a year
+SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
+FROM incident
+GROUP BY year
+ORDER BY year ASC;
 
 -- 5. NetWork
 -- Summary Protocol attribute

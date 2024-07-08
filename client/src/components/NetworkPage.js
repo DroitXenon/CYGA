@@ -17,7 +17,7 @@ function NetworkPage() {
   }, []);
 
   return (
-    <Box className="network" sx={{ p: 3, display: 'flex', flexDirection: 'row' }}>
+    <Box className="network" sx={{ display: 'flex', flexDirection: 'row' }}>
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Paper sx={{ mb: 3, flex: 1 }}>
           <Typography variant="h6" sx={{ p: 2 }}>

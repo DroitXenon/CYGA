@@ -20,10 +20,10 @@ Welcome to the repository for CYGA, the Cyber Geolocation Analysis tool designed
 - [Technologies Used](#technologies-used)
 
 ## Team Member
+* [Justin Wang](https://github.com/DroitXenon)  
 * [Yiran Dong](https://github.com/Rileyyiran)
 * [Liang He](https://github.com/zaizaijiayou)
 * [Yuqing Zhang](https://github.com/Yuqing-Zhang-branch)
-* [Justin Wang](https://github.com/DroitXenon)  
 
 ## Directory Layout
 ```plaintext

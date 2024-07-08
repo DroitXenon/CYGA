@@ -90,7 +90,7 @@ async function initializeDatabase() {
 }
 
 async function importCSV() {
-  const filePath = path.join(__dirname, '../shared/constants/production_data.csv');
+  const filePath = path.join(__dirname, '../shared/constants/sample_data.csv');
   const csvData = [];
 
   fs.createReadStream(filePath).pipe(csv()).on('data', (row) => {

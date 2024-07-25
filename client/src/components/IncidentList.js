@@ -6,6 +6,8 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
   const [sortOrder, setSortOrder] = useState('ASC');
   const [searchKeyword, setSearchKeyword] = useState('');
   
+  // Realize the sorting
+  // The sorting is implemented by sending a GET request to the server with the column name and order as query parameters.
   const handleSort = (column) => {
     const order = sortOrder === 'ASC' ? 'DESC' : 'ASC';
     setSortColumn(column);
@@ -13,6 +15,9 @@ function IncidentList({ incidents, onIncidentClick, onSort, onSelectIncident, se
     onSort(column, order);
   };
 
+
+  // Realize the search
+  // The search is implemented by sending a GET request to the server with the search keyword as a query parameter.
   const handleSearch = () => {
     if (searchKeyword.trim() === '') {
       fetchIncidents();

@@ -1,3 +1,4 @@
+// Code to create a server and connect to the database
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
@@ -32,6 +33,7 @@ async function initializeDatabase() {
   await db.query('CREATE DATABASE cyga;');
   await db.query('USE cyga;');
 
+  // Create tables
   const tableQueries = [
     `CREATE TABLE IF NOT EXISTS attacker (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -89,6 +91,7 @@ async function initializeDatabase() {
   importCSV();
 }
 
+// Import CSV data into the database
 async function importCSV() {
   const filePath = path.join(__dirname, '../shared/constants/production_data.csv');
   const csvData = [];
@@ -164,11 +167,13 @@ const baseQuery = `
   JOIN attacker a ON v.attackerId = a.id
 `;
 
+// API Endpoint for getting all incidents
 app.get('/api/incidents', async (req, res) => {
   const [results] = await db.query(baseQuery);
   res.json(results);
 });
 
+// API Endpoint for R6: Filter
 app.get('/api/search', async (req, res) => {
   const { keyword } = req.query;
   const searchQuery = `
@@ -187,8 +192,37 @@ app.get('/api/sort', async (req, res) => {
   res.json(results);
 });
 
-// openai.apiKey = process.env.OPENAI_API_KEY; 
+// API Endpoint for R7: View
+app.post('/api/create-view', async (req, res) => {
+  const { columns } = req.body;
 
+  if (!columns || columns.length === 0) {
+    return res.status(400).json({ error: 'No columns specified' });
+  }
+
+  const columnList = ['v.id', ...columns].join(', ');
+  const query = `
+    CREATE VIEW view_table AS
+    SELECT ${columnList}
+    FROM incident i
+    JOIN response r ON i.responseId = r.id
+    JOIN network_traffic n ON r.networkTrafficId = n.id
+    JOIN victim v ON n.victimId = v.id
+    JOIN attacker a ON v.attackerId = a.id;
+  `;
+
+  await db.query('DROP VIEW IF EXISTS view_table;');
+  await db.query(query);
+  console.log('View Table created.');
+  res.json({ message: 'View Table created.' });
+});
+
+app.get('/api/view-data', async (req, res) => {
+  const [results] = await db.query('SELECT * FROM view_table');
+  res.json(results);
+});
+
+// API Endpoint for R8: Analysis
 app.get('/api/analysis/:id', async (req, res) => {
   const { id } = req.params;
   const query = `
@@ -231,22 +265,84 @@ app.get('/api/analysis/:id', async (req, res) => {
   res.json(report);
 });
 
+// API Endpoint for R9: Time Stamp
+app.post('/api/incidents-time', async (req, res) => {
+  const { startTime, endTime } = req.body;
 
-app.delete('/api/delete/:id', async (req, res) => {
-  const { id } = req.params;
-  const deleteQuery = `
-    DELETE i, r, n, v, a
+  if (!startTime || !endTime) {
+    return res.status(400).json({ error: 'Start time and end time are required' });
+  }
+
+  const query = `
+    SELECT *
     FROM incident i
-    JOIN response r ON i.responseId = r.id
-    JOIN network_traffic n ON r.networkTrafficId = n.id
-    JOIN victim v ON n.victimId = v.id
-    JOIN attacker a ON v.attackerId = a.id
-    WHERE i.id = ?
+    WHERE Timestamp < ? AND Timestamp > ?;
   `;
-  await db.query(deleteQuery, [id]);
-  res.json({ message: 'Record deleted.' });
+
+  const [results] = await db.query(query, [endTime, startTime]);
+  res.json(results);
 });
 
+app.get('/api/attack-count', async (req, res) => {
+  const query = `
+    SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
+    FROM incident
+    GROUP BY year
+    ORDER BY year ASC;
+  `;
+
+  const [results] = await db.query(query);
+  res.json(results);
+});
+
+// API Endpoint for R10: Network Stats
+app.get('/api/network-stats', async (req, res) => {
+  const [protocolResults] = await db.query(`
+    SELECT Protocol, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY Protocol;
+  `);
+
+  const [trafficTypeResults] = await db.query(`
+    SELECT TrafficType, COUNT(*) as count
+    FROM network_traffic
+    GROUP BY TrafficType;
+  `);
+
+  res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
+});
+
+// API Endpoint for R11: Victim
+app.get('/api/victim-stats', async (req, res) => {
+  const [deviceInfoResults] = await db.query(`
+    SELECT DeviceInfo, COUNT(*) as count
+    FROM victim
+    GROUP BY DeviceInfo
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  const [geoLocationResults] = await db.query(`
+    SELECT GeoLocation, COUNT(*) as count
+    FROM victim
+    GROUP BY GeoLocation
+    ORDER BY count DESC
+    LIMIT 3
+  `);
+
+  res.json({
+    deviceInfoStats: deviceInfoResults,
+    geoLocationStats: geoLocationResults
+  });
+});
+
+app.get('/api/victims', async (req, res) => {
+  const [results] = await db.query('SELECT * FROM victim');
+  res.json(results);
+});
+
+
+// API Endpoint for R16: Editing(Add, Delete, Edit)
 app.post('/api/add', async (req, res) => {
   const {
     SourceIP, SourcePort, SourceLatitude, SourceLongitude,
@@ -281,33 +377,20 @@ app.post('/api/add', async (req, res) => {
   res.json({ message: 'Record added.' });
 });
 
-app.post('/api/create-view', async (req, res) => {
-  const { columns } = req.body;
 
-  if (!columns || columns.length === 0) {
-    return res.status(400).json({ error: 'No columns specified' });
-  }
-
-  const columnList = ['v.id', ...columns].join(', ');
-  const query = `
-    CREATE VIEW view_table AS
-    SELECT ${columnList}
+app.delete('/api/delete/:id', async (req, res) => {
+  const { id } = req.params;
+  const deleteQuery = `
+    DELETE i, r, n, v, a
     FROM incident i
     JOIN response r ON i.responseId = r.id
     JOIN network_traffic n ON r.networkTrafficId = n.id
     JOIN victim v ON n.victimId = v.id
-    JOIN attacker a ON v.attackerId = a.id;
+    JOIN attacker a ON v.attackerId = a.id
+    WHERE i.id = ?
   `;
-
-  await db.query('DROP VIEW IF EXISTS view_table;');
-  await db.query(query);
-  console.log('View Table created.');
-  res.json({ message: 'View Table created.' });
-});
-
-app.get('/api/view-data', async (req, res) => {
-  const [results] = await db.query('SELECT * FROM view_table');
-  res.json(results);
+  await db.query(deleteQuery, [id]);
+  res.json({ message: 'Record deleted.' });
 });
 
 app.post('/api/update', async (req, res) => {
@@ -321,7 +404,6 @@ app.post('/api/update', async (req, res) => {
     SET ?? = ?
     WHERE i.id = ?
   `;
-
   try {
     await db.query(query, [column, value, id]);
     console.log('Record updated.') ;
@@ -333,78 +415,6 @@ app.post('/api/update', async (req, res) => {
 });
 
 
-app.get('/api/network-stats', async (req, res) => {
-  const [protocolResults] = await db.query(`
-    SELECT Protocol, COUNT(*) as count
-    FROM network_traffic
-    GROUP BY Protocol;
-  `);
-
-  const [trafficTypeResults] = await db.query(`
-    SELECT TrafficType, COUNT(*) as count
-    FROM network_traffic
-    GROUP BY TrafficType;
-  `);
-
-  res.json({ protocolStats: protocolResults, trafficTypeStats: trafficTypeResults });
-});
-
-app.get('/api/victim-stats', async (req, res) => {
-  const [deviceInfoResults] = await db.query(`
-    SELECT DeviceInfo, COUNT(*) as count
-    FROM victim
-    GROUP BY DeviceInfo
-    ORDER BY count DESC
-    LIMIT 3
-  `);
-
-  const [geoLocationResults] = await db.query(`
-    SELECT GeoLocation, COUNT(*) as count
-    FROM victim
-    GROUP BY GeoLocation
-    ORDER BY count DESC
-    LIMIT 3
-  `);
-
-  res.json({
-    deviceInfoStats: deviceInfoResults,
-    geoLocationStats: geoLocationResults
-  });
-});
-
-app.get('/api/victims', async (req, res) => {
-  const [results] = await db.query('SELECT * FROM victim');
-  res.json(results);
-});
-
-app.post('/api/incidents-time', async (req, res) => {
-  const { startTime, endTime } = req.body;
-
-  if (!startTime || !endTime) {
-    return res.status(400).json({ error: 'Start time and end time are required' });
-  }
-
-  const query = `
-    SELECT *
-    FROM incident i
-    WHERE Timestamp < ? AND Timestamp > ?;
-  `;
-
-  const [results] = await db.query(query, [endTime, startTime]);
-  res.json(results);
-});
-
-app.get('/api/attack-count', async (req, res) => {
-  const query = `
-    SELECT DATE_FORMAT(Timestamp, '%Y') as year, COUNT(*) as attackCount
-    FROM incident
-    GROUP BY year
-    ORDER BY year ASC;
-  `;
-
-  const [results] = await db.query(query);
-  res.json(results);
-});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

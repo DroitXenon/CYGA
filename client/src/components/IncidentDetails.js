@@ -56,6 +56,8 @@ function IncidentDetails({ incident }) {
       .catch(error => console.error('Error fetching analysis report:', error));
   };
 
+  // Realize the view feature
+  // The view feature is implemented by sending a POST request to the server with the selected columns as the request body.
   const handleCreateView = () => {
     fetch(`http://localhost:5001/api/create-view`, {
       method: 'POST',
@@ -120,6 +122,7 @@ function IncidentDetails({ incident }) {
     );
   };
 
+  // Realize the Export Feature
   const generatePDF = () => {
     const doc = new jsPDF();
     

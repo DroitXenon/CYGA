@@ -1,3 +1,5 @@
+// This file is the main component of the application. It contains the AppBar, Drawer, and the main content of the application.
+
 import React, { useState } from 'react';
 import { CssBaseline, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, Divider, ListItemButton, ListItemIcon } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
